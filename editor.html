@@ -41,69 +41,60 @@
     <hr>
     <input id="insert" type="button" value="INSERT">
     <input id="add" type="button" value="ADD">
+    <input id="remove" type="button" value="DELETE">
 </div>
 <hr>
 <div id="acti-por">
     <div class="fixTableHead">
+        playlist
         <table id="ply-view">
             <thead>
                 <tr><th>start time</th><th>duration</th><th>path</th></tr>
             </thead>
-            <tbody>
-                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
-                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
-                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
-                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
-                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
-                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
-                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
-                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
-                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
-                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
-                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
-                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
-                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
-                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
-                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
-                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
-                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
-                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
-                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
-                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
-                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
-                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
-                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
-                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
-                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
-                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
-                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
-                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
-                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
-                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
-                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
-                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
-                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
-                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
-                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
-                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
-                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
-                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
-                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
-                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+            <tbody id="plyitemstbl">
+                
             </tbody>
         </table>
     </div>
-    <table id="inspector">ins</table>
+    <div class="fixTableHead">
+        inspector:
+        <table id="inspector">
+            <thead>
+                <tr><th>name</th><th>duration</th></tr>
+            </thead>
+        </table>
+    </div>
 </div>
 </body>
 </html>
 
 <script>
+    var uiLdply = {};
+
+    var myUrl = (window.location.protocol + "//" + window.location.hostname + ":" + window.location.port);
+    
+    function updateInspector() {
+        var availableClips = JSON.parse(httpGet(myUrl + "/clips"));
+        if (availableClips.status = "ok") {
+            for (var i = 0; i < availableClips.data.length; i++) {
+                availableClips.data [i];
+            }
+        } else if (availableClips.status = "err") {
+            //TODO
+        }
+    }
+    
     function httpGet(url) {
-        
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "GET", url, false );
+        xmlHttp.send( null );
+        return xmlHttp.responseText;
     }
     
     function httpPost(url, data) {
-        
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("POST", url, false);
+        xmlHttp.send(data);
+        return xmlHttp.responseText;
     }
 </script>
