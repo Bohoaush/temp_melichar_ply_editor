@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>temp melichar ply editor</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        body {
+            background-color: #121212;
+            color: #CCCCCC;
+        }
+        #acti-por div {
+            display: inline-block;
+        }
+        
+        .fixTableHead {
+            overflow-y: auto;
+            height: 800px;
+        }
+        .fixTableHead thead th {
+            position: sticky;
+            top: 0;
+        }
+        table {
+            border-collapse: collapse;        
+            width: 100%;
+        }
+        th,
+        td {
+            padding: 8px 15px;
+            border: 2px solid #555577;
+        }
+        th {
+            background: #111155;
+        }
+    </style>
+</head>
+<body>
+<div id="button-panel">
+    <input id="save" type="button" value="SAVE">
+    <input id="load" type="button" value="LOAD">
+    <hr>
+    <input id="insert" type="button" value="INSERT">
+    <input id="add" type="button" value="ADD">
+</div>
+<hr>
+<div id="acti-por">
+    <div class="fixTableHead">
+        <table id="ply-view">
+            <thead>
+                <tr><th>start time</th><th>duration</th><th>path</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
+                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
+                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
+                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
+                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
+                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
+                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
+                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
+                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
+                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
+                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
+                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
+                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
+                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
+                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
+                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
+                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
+                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
+                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
+                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+                <tr><td>06:00:00</td><td>12:34:56</td><td>/mnt/Video/test.mpg</td></tr>
+                <tr><td>06:20:00</td><td>12:34:56</td><td>/mnt/Video/test2.mpg</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <table id="inspector">ins</table>
+</div>
+</body>
+</html>
+
+<script>
+    function httpGet(url) {
+        
+    }
+    
+    function httpPost(url, data) {
+        
+    }
+</script>
