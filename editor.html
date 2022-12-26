@@ -32,6 +32,10 @@
         th {
             background: #111155;
         }
+        .selectedAdd {
+            color: #BBBBFF;
+            background-color: #222222;
+        }
     </style>
 </head>
 <body>
@@ -40,6 +44,7 @@
     <input id="load" type="button" value="LOAD">
     <hr>
     <input id="insert" type="button" value="INSERT">
+    <input id="ins-dummy" type="button" value="INSERT DUMMY">
     <input id="add" type="button" value="ADD">
     <input id="remove" type="button" value="DELETE">
 </div>
@@ -62,6 +67,8 @@
             <thead>
                 <tr><th>name</th><th>duration</th></tr>
             </thead>
+            <tbody id="avaClipTabl">
+            </tbody>
         </table>
     </div>
 </div>
@@ -73,13 +80,25 @@
 
     var myUrl = (window.location.protocol + "//" + window.location.hostname + ":" + window.location.port);
     
+    var selectedPlyItem = -1;
+    var selectedAddItem = -1;
+    
     function updateInspector() {
         var availableClips = JSON.parse(httpGet(myUrl + "/clips"));
         if (availableClips.status = "ok") {
+            var clipToWriteToInsp = "";
             for (var i = 0; i < availableClips.data.length; i++) {
-                availableClips.data [i];
+                clipToWriteToInsp += ("<tr class=\"avClipTblItem\" id=\"acl" + i + "\"><td>" + availableClips.data[i].name + "</td><td>" + availableClips.data[i].duration + "</td></tr>");
             }
-        } else if (availableClips.status = "err") {
+            document.getElementById("avaClipTabl").innerHTML = clipToWriteToInsp;
+            $(".avClipTblItem").click(function(){
+                if (selectedAddItem != -1) {
+                    document.getElementById(selectedAddItem).classList.remove("selectedAdd");
+                }
+                selectedAddItem = this.id;
+                document.getElementById(selectedAddItem).classList.add("selectedAdd");
+            });
+        } else if (availableClips.status == "err") {
             //TODO
         }
     }

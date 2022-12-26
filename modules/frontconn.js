@@ -1,8 +1,8 @@
 var http = require("http");
 var fs = require("fs");
 
-var fileinfo = require("fileinform.js");
-var filehandle = require("filehandler.js");
+var fileinfo = require("./fileinform.js");
+var filehandle = require("./filehandler.js");
 
 http.createServer(async function (req, res) {
     switch(req.url) {
@@ -21,12 +21,15 @@ http.createServer(async function (req, res) {
             
         case "/clips":
             var retObj = {}
-            fileinfo.cls().then(retCls => {
+            fileinfo.ccgtunnel.cls().then(retCls => {
                 retObj.status = "ok";
+                console.log(retCls);
                 retObj.data = retCls.response.data;
                 res.write(JSON.stringify(retObj));
                 res.end();
+                console.log(retObj);
             }).catch(err => {
+                console.log(err);
                 retObj.status = "err";
                 retObj.data = JSON.stringify(err);
                 res.end();
@@ -38,7 +41,7 @@ http.createServer(async function (req, res) {
                 res.write(JSON.stringify(filenames));
             }).catch(err => {
                 //TODO
-            }
+            });
             break;
             
         case "/open":
@@ -61,6 +64,19 @@ http.createServer(async function (req, res) {
         case "/copyfile":
             //TODO
             break;
+            
+        default:
+            fs.readFile("editor.html", function(err, data) {
+                if (err) {
+                    res.writeHead(500);
+                    res.end();
+                } else {
+                    res.writeHead(200, {'Content-Type': 'text/html'});
+                    res.write(data);
+                    res.end();
+                }
+            });
+            break;
         
     }
-}).listen(config.settings,front_port);
+}).listen(8087);
