@@ -5,8 +5,8 @@ var xmlparser = new fastxmlparser.XMLParser({ignoreAttributes: false});
 var xmlbuilder = new fastxmlparser.XMLBuilder({ignoreAttributes: false});
 
 function loadPlyFromFile(filename) {
-    return new Promise(resolve => {
-        fs.readFile("ply/" + filename, function(err, data) {
+    return new Promise((resolve, reject) => {
+        fs.readFile("/mnt/Video/playlisty/" + filename, function(err, data) {
             if (err) {
                 reject(err);
             } else {
@@ -16,6 +16,7 @@ function loadPlyFromFile(filename) {
                     jsoitem.path = plyitem['#text'];
                     jsoitem.duration = plyitem['@_duration'];
                     plyItemsArr.push(jsoitem);
+                    console.log(jsoitem);
                 }
                 resolve(plyItemsArr);
             }
@@ -24,8 +25,8 @@ function loadPlyFromFile(filename) {
 }
 
 function listAvailablePlys() {
-    return new Promise(resolve => {
-        fs.readdir("ply/", (err, filenames) => {
+    return new Promise((resolve, reject) => {
+        fs.readdir("/mnt/Video/playlisty", (err, filenames) => {
             if (err) {
                 reject(err);
             } else {

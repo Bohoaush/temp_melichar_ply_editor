@@ -41,6 +41,7 @@
 <body>
 <div id="button-panel">
     <input id="save" type="button" value="SAVE">
+    <select id="ldfilename"></select>
     <input id="load" type="button" value="LOAD">
     <hr>
     <input id="insert" type="button" value="INSERT">
@@ -189,6 +190,38 @@
             httpPost(myUrl + "/save", JSON.stringify(sendPlyObj));
         } else {
             window.alert("You need to specify the filename!");
+        }
+    }
+    
+    $("#ldfilename").click(function() {
+        var avaPlys = JSON.parse(httpGet(myUrl + "/plys"));
+        setTimeout(function(){
+            console.log(avaPlys);
+        }, 2000);
+        var avaPlyList = "";
+        for (avaPly of avaPlys) {
+            avaPlyList += "<option value=\"" + avaPly + "\">" + avaPly + "</input>\n"
+        }
+        document.getElementById("ldfilename").innerHTML = avaPlyList;
+    });
+    
+    $("#load").click(function() {
+        loadPly();
+    });
+    
+    function loadPly() {
+        let plyToLoadList = document.getElementById("ldfilename");
+        if (plyToLoadList.value != "" && plyToLoadList.value != null && plyToLoadList.value != undefined) {
+            console.log(plyToLoadList.value);
+            uiLdPly.plyitems = JSON.parse(httpPost((myUrl + "/open"), plyToLoadList.value));
+            uiLdPly.plyitems[0].startTime = new Date(Date.now());
+            uiLdPly.plyitems[0].startTime = uiLdPly.plyitems[0].startTime.setHours(6, 0, 0);
+            for (let i = 1; i < uiLdPly.plyitems.length; i++) {
+                 uiLdPly.plyitems[i].startTime = (uiLdPly.plyitems[i-1].startTime + (uiLdPly.plyitems[i-1].duration*1000));
+            }
+            drawPlaylist();
+        } else {
+            alert("You need to specify filename to load!");
         }
     }
     

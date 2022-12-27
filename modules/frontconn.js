@@ -39,8 +39,10 @@ http.createServer(async function (req, res) {
         case "/plys":
             filehandle.listAvailablePlys().then(filenames => {
                 res.write(JSON.stringify(filenames));
+                res.end();
             }).catch(err => {
-                //TODO
+                console.log(err);
+                res.end();
             });
             break;
             
@@ -51,13 +53,12 @@ http.createServer(async function (req, res) {
             });
             req.on('end', function() {
                 filehandle.loadPlyFromFile(opnPlyName).then(ply => {
-                    res.write(ply);
+                    res.write(JSON.stringify(ply));
                     res.end();
                 }).catch(err => {
-                    //TODO
+                    console.log(err);
+                    res.end();
                 });
-            }).catch(err => { 
-                //TODO
             });
             break;
             
