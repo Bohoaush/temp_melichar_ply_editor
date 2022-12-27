@@ -21,7 +21,7 @@
             top: 0;
         }
         table {
-            border-collapse: collapse;        
+            border-collapse: collapse;
             width: 100%;
         }
         th,
@@ -171,6 +171,25 @@
             itemToAdd.startTime = itemToAdd.startTime.setHours(6, 0, 0);
         }
         drawPlaylist();
+    }
+    
+    $("#save").click(function() {
+        savePly();
+    });
+    
+    function savePly() {
+        let savefilename = window.prompt("Playlist name:", "yyyymmdd.ply");
+        if (savefilename != null && savefilename != "") {
+            if (!savefilename.match(/\.ply$/)) {
+                savefilename = savefilename + ".ply";
+            }
+            var sendPlyObj = {};
+            sendPlyObj.ply = uiLdPly;
+            sendPlyObj.name = savefilename;
+            httpPost(myUrl + "/save", JSON.stringify(sendPlyObj));
+        } else {
+            window.alert("You need to specify the filename!");
+        }
     }
     
     function httpGet(url) {

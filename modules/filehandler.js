@@ -4,9 +4,9 @@ var fastxmlparser = require("fast-xml-parser");
 var xmlparser = new fastxmlparser.XMLParser({ignoreAttributes: false});
 var xmlbuilder = new fastxmlparser.XMLBuilder({ignoreAttributes: false});
 
-function loadPlyFromFile("ply/" + filename) {
+function loadPlyFromFile(filename) {
     return new Promise(resolve => {
-        fs.readFile(filename, function(err, data) {
+        fs.readFile("ply/" + filename, function(err, data) {
             if (err) {
                 reject(err);
             } else {
@@ -19,8 +19,8 @@ function loadPlyFromFile("ply/" + filename) {
                 }
                 resolve(plyItemsArr);
             }
-        }
-    }
+        });
+    });
 }
 
 function listAvailablePlys() {
@@ -35,19 +35,26 @@ function listAvailablePlys() {
     });
 }
 
-function writePlyToFile(playlistObj, "ply/" + filename) {
+function writePlyToFile(playlistObj, filename) {
     var exportXml = "<?xml version=\"1.0\"?>\n<playlist>\n"
-    for (let plyitem of playlistObj) {
-        exportXml += "   <clip duration=\"" + plyitem.duration + "\">" + plyitem.path + "</clip>\n");
+    for (let plyitem of playlistObj.plyitems) {
+        exportXml += ("   <clip duration=\"" + plyitem.duration + "\">" + plyitem.path + "</clip>\n");
     }
     exportXml += "</playlist>";
-    fs.writeFile(filename, exportXml, (err) => {
+    fs.writeFile("/mnt/Video/playlisty/" + filename, exportXml, (err) => {
         if (err) {
             console.log(err);
         }
-    }
+    });
 }
 
 function copyPlyTo(filename, destination) {
     //TODO
+}
+
+
+module.exports = {
+    writePlyToFile,
+    listAvailablePlys,
+    loadPlyFromFile
 }

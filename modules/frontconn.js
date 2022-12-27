@@ -14,7 +14,7 @@ http.createServer(async function (req, res) {
             });
             req.on('end', function() {
                 receivedData = JSON.parse(receivedData);
-                filehandle.writePlyToFile(receivedData.ply, (config.settings.plydir + receivedData.name));
+                filehandle.writePlyToFile(receivedData.ply, (receivedData.name));
             });
             res.end();
             break;

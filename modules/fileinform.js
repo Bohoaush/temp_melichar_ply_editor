@@ -1,8 +1,11 @@
-var ccg = require("casparcg-connection");
+var ccg = require('casparcg-connection');
 
-var ccgtunnel = new ccg(config.settings.ccg_ip, config.settings.ccg_port);
+var ccgtunnel = new ccg.CasparCG({port: 62232});
 
-function listFiles() {
+/*function listFiles() {
     return fileObjs;
-}
+}*/
 
+module.exports = {
+    ccgtunnel
+}
