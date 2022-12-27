@@ -36,6 +36,10 @@
             color: #BBBBFF;
             background-color: #222222;
         }
+        .selectedPlyIt {
+            color: #AABBFF;
+            background-color: #222222;
+        }
     </style>
 </head>
 <body>
@@ -48,6 +52,8 @@
     <input id="ins-dummy" type="button" value="INSERT DUMMY">
     <input id="add" type="button" value="ADD">
     <input id="remove" type="button" value="DELETE">
+    &nbsp&nbsp&nbsp&nbsp
+    <input id="updInsp" type="button" value="UPDATE INSPECTOR">
 </div>
 <hr>
 <div id="acti-por">
@@ -84,6 +90,12 @@
     
     var selectedPlyItem = -1;
     var selectedAddItem = -1;
+    
+    $("#updInsp").click(function() {
+        updateInspector();
+    });
+    
+    updateInspector();
     
     function updateInspector() {
         availableClips = JSON.parse(httpGet(myUrl + "/clips"));
@@ -129,6 +141,16 @@
             plyToDraw += ("\" id=\"" + i + "\"><td>" + startTimeString + "</td><td>" + plitDurDisp + "</td><td>" + uiLdPly.plyitems[i].path + "</td></tr>");
         }
         document.getElementById("plyitemstbl").innerHTML = plyToDraw;
+        if (selectedPlyItem != -1) {
+            document.getElementById(selectedPlyItem).classList.add("selectedPlyIt");
+        }
+        $(".plyitem").click(function(){
+            if (selectedPlyItem != -1) {
+                document.getElementById(selectedPlyItem).classList.remove("selectedPlyIt");
+            }
+            selectedPlyItem = this.id;
+            document.getElementById(selectedPlyItem).classList.add("selectedPlyIt");
+        });
     }
     
     $("#insert").click(function() {
@@ -139,11 +161,19 @@
         if (selectedPlyItem != -1) {
             var itemToAdd = {};
             itemToAdd.aclid = selectedAddItem.replace("acl", "");
-            itemToAdd.id = selectedPlyItem.id;
+            itemToAdd.id = selectedPlyItem;
             itemToAdd.path = availableClips.data[itemToAdd.aclid].name;
             itemToAdd.duration = availableClips.data[itemToAdd.aclid].duration;
             uiLdPly.plyitems.splice(selectedPlyItem, 0, itemToAdd);
-            for (let i = itemToAdd.id; i < uiLdPly.plyitems.length; i++) {
+            if (selectedPlyItem > 0) {
+                uiLdPly.plyitems[itemToAdd.id].id = itemToAdd.id;
+                uiLdPly.plyitems[itemToAdd.id].startTime = (uiLdPly.plyitems[itemToAdd.id-1].startTime + (uiLdPly.plyitems[itemToAdd.id-1].duration*1000));
+            } else {
+                uiLdPly.plyitems[itemToAdd.id].startTime = new Date(Date.now());
+                uiLdPly.plyitems[itemToAdd.id].startTime = uiLdPly.plyitems[itemToAdd.id].startTime.setHours(6, 0, 0);
+            }
+            for (let i = (itemToAdd.id - -1); i < uiLdPly.plyitems.length; i++) {
+                console.log("test");
                 uiLdPly.plyitems[i].id = i;
                 uiLdPly.plyitems[i].startTime = (uiLdPly.plyitems[i-1].startTime + (uiLdPly.plyitems[i-1].duration*1000));
             }
@@ -214,10 +244,12 @@
         if (plyToLoadList.value != "" && plyToLoadList.value != null && plyToLoadList.value != undefined) {
             console.log(plyToLoadList.value);
             uiLdPly.plyitems = JSON.parse(httpPost((myUrl + "/open"), plyToLoadList.value));
+            uiLdPly.plyitems[0].id = 0;
             uiLdPly.plyitems[0].startTime = new Date(Date.now());
             uiLdPly.plyitems[0].startTime = uiLdPly.plyitems[0].startTime.setHours(6, 0, 0);
             for (let i = 1; i < uiLdPly.plyitems.length; i++) {
-                 uiLdPly.plyitems[i].startTime = (uiLdPly.plyitems[i-1].startTime + (uiLdPly.plyitems[i-1].duration*1000));
+                uiLdPly.plyitems[i].id = i;
+                uiLdPly.plyitems[i].startTime = (uiLdPly.plyitems[i-1].startTime + (uiLdPly.plyitems[i-1].duration*1000));
             }
             drawPlaylist();
         } else {
