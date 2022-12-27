@@ -49,8 +49,11 @@
     <input id="load" type="button" value="LOAD">
     <hr>
     <input id="insert" type="button" value="INSERT">
-    <input id="ins-dummy" type="button" value="INSERT DUMMY">
     <input id="add" type="button" value="ADD">
+    &nbsp&nbsp&nbsp&nbsp
+    <input id="ins-dummy" type="button" value="INSERT DUMMY">
+    <input id="add-dummy" type="button" value="ADD DUMMY">
+    &nbsp&nbsp&nbsp&nbsp
     <input id="remove" type="button" value="DELETE">
     &nbsp&nbsp&nbsp&nbsp
     <input id="updInsp" type="button" value="UPDATE INSPECTOR">
@@ -131,7 +134,7 @@
             
             var plitDurHour = Math.trunc(uiLdPly.plyitems[i].duration/3600);
             if (plitDurHour < 10) {plitDurHour = "0" + plitDurHour;}
-            var plitDurMinu = Math.trunc((uiLdPly.plyitems[i].duration-(plitDurHour*60))/60);
+            var plitDurMinu = Math.trunc((uiLdPly.plyitems[i].duration-(plitDurHour*3600))/60);
             if (plitDurMinu < 10) {plitDurMinu = "0" + plitDurMinu;}
             var plitDurSeco = Math.floor(uiLdPly.plyitems[i].duration-(plitDurHour*3600)-(plitDurMinu*60));
             if (plitDurSeco < 10) {plitDurSeco = "0" + plitDurSeco;}
@@ -255,6 +258,56 @@
         } else {
             alert("You need to specify filename to load!");
         }
+    }
+    
+    $("#ins-dummy").click(function() {
+        insertDummy();
+    });
+    
+    function insertDummy() {
+        let dummydur = window.prompt("Dummy duration in seconds: ");
+        if (selectedPlyItem != -1) {
+            var itemToAdd = {};
+            itemToAdd.id = selectedPlyItem;
+            itemToAdd.path = "DUMMY_CLIP";
+            itemToAdd.duration = dummydur;
+            uiLdPly.plyitems.splice(selectedPlyItem, 0, itemToAdd);
+            if (selectedPlyItem > 0) {
+                uiLdPly.plyitems[itemToAdd.id].id = itemToAdd.id;
+                uiLdPly.plyitems[itemToAdd.id].startTime = (uiLdPly.plyitems[itemToAdd.id-1].startTime + (uiLdPly.plyitems[itemToAdd.id-1].duration*1000));
+            } else {
+                uiLdPly.plyitems[itemToAdd.id].startTime = new Date(Date.now());
+                uiLdPly.plyitems[itemToAdd.id].startTime = uiLdPly.plyitems[itemToAdd.id].startTime.setHours(6, 0, 0);
+            }
+            for (let i = (itemToAdd.id - -1); i < uiLdPly.plyitems.length; i++) {
+                console.log("test");
+                uiLdPly.plyitems[i].id = i;
+                uiLdPly.plyitems[i].startTime = (uiLdPly.plyitems[i-1].startTime + (uiLdPly.plyitems[i-1].duration*1000));
+            }
+            drawPlaylist();
+        } else {
+            addDummyToPly();
+        }
+    }
+    
+    $("#add-dummy").click(function() {
+        addDummyToPly();
+    });
+    
+    function addDummyToPly() {
+        let dummydur = window.prompt("Dummy duration in seconds: ");
+        var itemToAdd = {};
+        itemToAdd.id = uiLdPly.plyitems.length;
+        itemToAdd.path = "DUMMY_CLIP";
+        itemToAdd.duration = dummydur;
+        if (itemToAdd.id > 0) {
+            itemToAdd.startTime = (uiLdPly.plyitems[itemToAdd.id-1].startTime + (uiLdPly.plyitems[itemToAdd.id-1].duration*1000));
+        } else {
+            itemToAdd.startTime = new Date(Date.now());
+            itemToAdd.startTime = itemToAdd.startTime.setHours(6, 0, 0);
+        }
+        uiLdPly.plyitems.push(itemToAdd);
+        drawPlaylist();
     }
     
     function httpGet(url) {
