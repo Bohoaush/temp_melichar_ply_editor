@@ -76,7 +76,8 @@
 </html>
 
 <script>
-    var uiLdply = {};
+    var uiLdPly = {plyitems:[]};
+    var availableClips;
 
     var myUrl = (window.location.protocol + "//" + window.location.hostname + ":" + window.location.port);
     
@@ -84,7 +85,7 @@
     var selectedAddItem = -1;
     
     function updateInspector() {
-        var availableClips = JSON.parse(httpGet(myUrl + "/clips"));
+        availableClips = JSON.parse(httpGet(myUrl + "/clips"));
         if (availableClips.status = "ok") {
             var clipToWriteToInsp = "";
             for (var i = 0; i < availableClips.data.length; i++) {
@@ -101,6 +102,75 @@
         } else if (availableClips.status == "err") {
             //TODO
         }
+    }
+    
+    function drawPlaylist() {
+        var plyToDraw = "";
+        for (let i = 0; i < uiLdPly.plyitems.length; i++) {
+            plyToDraw += "<tr class=\"plyitem";
+            
+            if (i%2 == 0) {
+                plyToDraw += " even";
+            }
+            
+            var startTimeUTCms = new Date(Math.floor(uiLdPly.plyitems[i].startTime));
+            var startTimeString = startTimeUTCms.toLocaleString('en-GB', {timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone});
+            
+            var plitDurHour = Math.trunc(uiLdPly.plyitems[i].duration/3600);
+            if (plitDurHour < 10) {plitDurHour = "0" + plitDurHour;}
+            var plitDurMinu = Math.trunc((uiLdPly.plyitems[i].duration-(plitDurHour*60))/60);
+            if (plitDurMinu < 10) {plitDurMinu = "0" + plitDurMinu;}
+            var plitDurSeco = Math.floor(uiLdPly.plyitems[i].duration-(plitDurHour*3600)-(plitDurMinu*60));
+            if (plitDurSeco < 10) {plitDurSeco = "0" + plitDurSeco;}
+            var plitDurDisp = plitDurHour + ":" + plitDurMinu + ":" + plitDurSeco;
+            
+            
+            plyToDraw += ("\" id=\"" + i + "\"><td>" + startTimeString + "</td><td>" + plitDurDisp + "</td><td>" + uiLdPly.plyitems[i].path + "</td></tr>");
+        }
+        document.getElementById("plyitemstbl").innerHTML = plyToDraw;
+    }
+    
+    $("#insert").click(function() {
+        insSelToPly();
+    });
+    
+    function insSelToPly() {
+        if (selectedPlyItem != -1) {
+            var itemToAdd = {};
+            itemToAdd.aclid = selectedAddItem.replace("acl", "");
+            itemToAdd.id = selectedPlyItem.id;
+            itemToAdd.path = availableClips.data[itemToAdd.aclid].name;
+            itemToAdd.duration = availableClips.data[itemToAdd.aclid].duration;
+            uiLdPly.plyitems.splice(selectedPlyItem, 0, itemToAdd);
+            for (let i = itemToAdd.id; i < uiLdPly.plyitems.length; i++) {
+                uiLdPly.plyitems[i].id = i;
+                uiLdPly.plyitems[i].startTime = (uiLdPly.plyitems[i-1].startTime + (uiLdPly.plyitems[i-1].duration*1000));
+            }
+            drawPlaylist();
+        } else {
+            addSelToPly();
+        }
+    }
+    
+    $("#add").click(function() {
+        addSelToPly();
+    });
+    
+    function addSelToPly() {
+        var itemToAdd = {};
+        itemToAdd.aclid = selectedAddItem.replace("acl", "");
+        itemToAdd.id = uiLdPly.plyitems.length;
+        itemToAdd.path = availableClips.data[itemToAdd.aclid].name;
+        itemToAdd.duration = availableClips.data[itemToAdd.aclid].duration;
+        uiLdPly.plyitems.push(itemToAdd);
+        if (itemToAdd.id > 0) {
+            itemToAdd.startTime = (uiLdPly.plyitems[itemToAdd.id-1].startTime + (uiLdPly.plyitems[itemToAdd.id-1].duration*1000));
+        } else {
+            itemToAdd.startTime = new Date(Date.now());
+            console.log(itemToAdd.startTime);
+            itemToAdd.startTime = itemToAdd.startTime.setHours(6, 0, 0);
+        }
+        drawPlaylist();
     }
     
     function httpGet(url) {
