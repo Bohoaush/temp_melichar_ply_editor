@@ -39,7 +39,7 @@ function listAvailablePlys() {
 function writePlyToFile(playlistObj, filename) {
     var exportXml = "<?xml version=\"1.0\"?>\n<playlist>\n"
     for (let plyitem of playlistObj.plyitems) {
-        exportXml += ("   <clip duration=\"" + Math.trunc(plyitem.duration) + "\">/mnt/Video/" + plyitem.path + "</clip>\n");
+        exportXml += ("   <clip duration=\"" + parseInt(plyitem.duration) + "\">/mnt/Video/" + plyitem.path + "</clip>\n");
     }
     exportXml += "</playlist>";
     fs.writeFile("/mnt/Video/playlisty/" + filename, exportXml, (err) => {
