@@ -310,6 +310,23 @@
         drawPlaylist();
     }
     
+    $("#remove").click(function() {
+        deleteItemFromPly();
+    });
+    
+    function deleteItemFromPly() {
+        if (selectedPlyItem != -1) {
+            delete uiLdPly.plyitems[selectedPlyItem];
+            uiLdPly.plyitems = uiLdPly.plyitems.filter(aplit => aplit !== null);
+            for (let i = selectedPlyItem; i < uiLdPly.plyitems.length; i++) {
+                uiLdPly.plyitems[i].id = i;
+            }
+            drawPlaylist();
+        } else {
+            window.alert("No item selected for deletion");
+        }
+    }
+    
     function httpGet(url) {
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.open( "GET", url, false );
