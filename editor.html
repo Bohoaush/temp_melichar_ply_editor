@@ -109,6 +109,7 @@
             }
             document.getElementById("avaClipTabl").innerHTML = clipToWriteToInsp;
             $(".avClipTblItem").click(function(){
+                conInsp = true;
                 if (selectedAddItem != -1) {
                     document.getElementById(selectedAddItem).classList.remove("selectedAdd");
                 }
@@ -148,6 +149,7 @@
             document.getElementById(selectedPlyItem).classList.add("selectedPlyIt");
         }
         $(".plyitem").click(function(){
+            conInsp = false;
             if (selectedPlyItem != -1) {
                 document.getElementById(selectedPlyItem).classList.remove("selectedPlyIt");
             }
@@ -326,6 +328,56 @@
             window.alert("No item selected for deletion");
         }
     }
+    
+    var conInsp = false;
+    
+    document.addEventListener('keydown', function(event) {
+        switch(event.keyCode) {
+            //insert key
+            case 45:
+                conInsp = true;
+                break;
+                
+            //up arrow
+            case 38:
+                if (!conInsp && selectedPlyItem > 0) {
+                    document.getElementById(selectedPlyItem).classList.remove("selectedPlyIt");
+                    selectedPlyItem -= 1;
+                    document.getElementById(selectedPlyItem).classList.add("selectedPlyIt");
+                } else if (selectedAddItem.replace("acl", "") > 0) {
+                    document.getElementById(selectedAddItem).classList.remove("selectedAdd");
+                    selectedAddItem = selectedAddItem.replace("acl", "");
+                    selectedAddItem -= 1;
+                    selectedAddItem = ("acl" + selectedAddItem);
+                    document.getElementById(selectedAddItem).classList.add("selectedAdd");
+                }
+                break;
+                
+            //down arrow
+            case 40:
+                if (!conInsp && selectedPlyItem < uiLdPly.plyitems.length - 1) {
+                    document.getElementById(selectedPlyItem).classList.remove("selectedPlyIt");
+                    selectedPlyItem -= -1;
+                    document.getElementById(selectedPlyItem).classList.add("selectedPlyIt");
+                } else if (selectedAddItem.replace("acl", "") < availableClips.data.length - 1) {
+                    document.getElementById(selectedAddItem).classList.remove("selectedAdd");
+                    selectedAddItem = selectedAddItem.replace("acl", "");
+                    selectedAddItem -= -1;
+                    selectedAddItem = ("acl" + selectedAddItem);
+                    document.getElementById(selectedAddItem).classList.add("selectedAdd");
+                }
+                break;
+                
+            //enter
+            case 13:
+                if (conInsp) {
+                    insSelToPly();
+                    conInsp = false;
+                }
+                break;
+            
+        }
+    }, true);
     
     function httpGet(url) {
         var xmlHttp = new XMLHttpRequest();
