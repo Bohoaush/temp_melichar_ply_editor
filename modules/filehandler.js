@@ -14,7 +14,7 @@ function loadPlyFromFile(filename) {
                 for (let plyitem of xmlparser.parse(data).playlist.clip) {
                     var jsoitem = {}
                     jsoitem.path = plyitem['#text'].replace("/mnt/Video/", "");
-                    jsoitem.duration = plyitem['@_duration'];
+                    jsoitem.duration = (plyitem['@_duration']/1000);
                     plyItemsArr.push(jsoitem);
                     console.log(jsoitem);
                 }
@@ -39,7 +39,7 @@ function listAvailablePlys() {
 function writePlyToFile(playlistObj, filename) {
     var exportXml = "<?xml version=\"1.0\"?>\n<playlist>\n"
     for (let plyitem of playlistObj.plyitems) {
-        exportXml += ("   <clip duration=\"" + parseInt(plyitem.duration) + "\">/mnt/Video/" + plyitem.path + "</clip>\n");
+        exportXml += ("   <clip duration=\"" + parseInt(plyitem.duration*1000) + "\">/mnt/Video/" + plyitem.path + "</clip>\n");
     }
     exportXml += "</playlist>";
     fs.writeFile("/mnt/Video/playlisty/" + filename, exportXml, (err) => {

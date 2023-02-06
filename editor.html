@@ -33,12 +33,25 @@
             background: #111155;
         }
         .selectedAdd {
-            color: #BBBBFF;
+            color: #000088;
+            background-color: #BBBB00;
+        }
+        .even {
             background-color: #222222;
         }
         .selectedPlyIt {
-            color: #AABBFF;
-            background-color: #222222;
+            color: #000088;
+            background-color: #BBBB00;
+        }
+        #plyViWr {
+            width: 60%;
+        }
+        #inspWr {
+            width: 35%;
+        }
+        #inspWr table tbody td {
+            word-wrap: break-word;
+            max-width: 70%;
         }
     </style>
 </head>
@@ -47,6 +60,8 @@
     <input id="save" type="button" value="SAVE">
     <select id="ldfilename"></select>
     <input id="load" type="button" value="LOAD">
+    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+    <input type="checkbox" id="autoScroll"> enable auto scroll (use alt + up/down to scroll manually)
     <hr>
     <input id="insert" type="button" value="INSERT">
     <input id="add" type="button" value="ADD">
@@ -56,11 +71,14 @@
     &nbsp&nbsp&nbsp&nbsp
     <input id="remove" type="button" value="DELETE">
     &nbsp&nbsp&nbsp&nbsp
-    <input id="updInsp" type="button" value="UPDATE INSPECTOR">
+    <input id="mvUp" type="button" value="UP">
+    <input id="mvDwn" type="button" value="DOWN">
+    &nbsp&nbsp&nbsp&nbsp
+    <input id="updInsp" type="button" value="UPDATE AVAILABLE CLIPS">
 </div>
 <hr>
 <div id="acti-por">
-    <div class="fixTableHead">
+    <div class="fixTableHead" id="plyViWr">
         playlist
         <table id="ply-view">
             <thead>
@@ -71,8 +89,8 @@
             </tbody>
         </table>
     </div>
-    <div class="fixTableHead">
-        inspector:
+    <div class="fixTableHead" id="inspWr">
+        available clips:
         <table id="inspector">
             <thead>
                 <tr><th>name</th><th>duration</th></tr>
@@ -132,6 +150,7 @@
             
             var startTimeUTCms = new Date(Math.floor(uiLdPly.plyitems[i].startTime));
             var startTimeString = startTimeUTCms.toLocaleString('en-GB', {timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone});
+            startTimeString = startTimeString.replace(/..\/..\/...., /, "");
             
             var plitDurHour = Math.trunc(uiLdPly.plyitems[i].duration/3600);
             if (plitDurHour < 10) {plitDurHour = "0" + plitDurHour;}
@@ -214,7 +233,7 @@
     });
     
     function savePly() {
-        let savefilename = window.prompt("Playlist name:", "yyyymmdd.ply");
+        let savefilename = window.prompt("Playlist name:", "playlist_yyyymmdd.ply");
         if (savefilename != null && savefilename != "") {
             if (!savefilename.match(/\.ply$/)) {
                 savefilename = savefilename + ".ply";
@@ -228,7 +247,7 @@
         }
     }
     
-    $("#ldfilename").click(function() {
+    $("#ldfilename").focus(function() {
         var avaPlys = JSON.parse(httpGet(myUrl + "/plys"));
         setTimeout(function(){
             console.log(avaPlys);
@@ -318,16 +337,55 @@
     
     function deleteItemFromPly() {
         if (selectedPlyItem != -1) {
+            if (selectedPlyItem == (uiLdPly.plyitems.length - 1) && selectedPlyItem > 0) {
+                document.getElementById(selectedPlyItem).classList.remove("selectedPlyIt");
+                selectedPlyItem -= 1;
+                document.getElementById(selectedPlyItem).classList.add("selectedPlyIt");
+            }
             delete uiLdPly.plyitems[selectedPlyItem];
             uiLdPly.plyitems = uiLdPly.plyitems.filter(aplit => aplit !== null);
             for (let i = selectedPlyItem; i < uiLdPly.plyitems.length; i++) {
                 uiLdPly.plyitems[i].id = i;
+                if (i > 0) {
+                    uiLdPly.plyitems[i].startTime = (uiLdPly.plyitems[i-1].startTime + (uiLdPly.plyitems[i-1].duration*1000));
+                } else if (i == 0) {
+                    uiLdPly.plyitems[i].startTime = new Date(Date.now());
+                    uiLdPly.plyitems[i].startTime = uiLdPly.plyitems[i].startTime.setHours(6, 0, 0);
+                }
             }
             drawPlaylist();
         } else {
             window.alert("No item selected for deletion");
         }
     }
+    
+    $("#mvUp").click(function() {
+        mvItem(-1);
+    });
+    $("#mvDwn").click(function() {
+        mvItem(1);
+    });
+    
+    function mvItem(direction) {
+        let templitem = uiLdPly.plyitems[selectedPlyItem]
+        if (uiLdPly.plyitems[selectedPlyItem - -direction]) {
+            uiLdPly.plyitems[selectedPlyItem] = uiLdPly.plyitems[selectedPlyItem - -direction];
+            selectedPlyItem = selectedPlyItem - -direction;
+            uiLdPly.plyitems[selectedPlyItem] = templitem;
+            let recountFrom = 0;
+            if (selectedPlyItem > 0) recountFrom = selectedPlyItem - 1;
+            for (let i = recountFrom; i < uiLdPly.plyitems.length; i++) {
+                uiLdPly.plyitems[i].id = i;
+                if (i > 0) {
+                    uiLdPly.plyitems[i].startTime = (uiLdPly.plyitems[i-1].startTime + (uiLdPly.plyitems[i-1].duration*1000));
+                } else if (i == 0) {
+                    uiLdPly.plyitems[i].startTime = new Date(Date.now());
+                    uiLdPly.plyitems[i].startTime = uiLdPly.plyitems[i].startTime.setHours(6, 0, 0);
+                }
+            }
+            drawPlaylist();
+        }
+    } //TODO finish
     
     var conInsp = false;
     
@@ -340,31 +398,65 @@
                 
             //up arrow
             case 38:
-                if (!conInsp && selectedPlyItem > 0) {
+                event.preventDefault();
+                if (event.ctrlKey) {
+                    mvItem(-1);
+                } else if (event.altKey) {
+                    var whatWillScroll;
+                    if (!conInsp) {
+                        whatWillScroll = document.getElementById("plyViWr");
+                    } else {
+                        whatWillScroll = document.getElementById("inspWr");
+                    }
+                    whatWillScroll.scrollTo({top: whatWillScroll.scrollTop - 200, behavior: "smooth"});
+                } else if (!conInsp && selectedPlyItem > 0) {
                     document.getElementById(selectedPlyItem).classList.remove("selectedPlyIt");
                     selectedPlyItem -= 1;
                     document.getElementById(selectedPlyItem).classList.add("selectedPlyIt");
+                    if (document.getElementById("autoScroll").checked) {
+                        document.getElementById(selectedPlyItem).scrollIntoView({behavior: "smooth", block: "end"});
+                    }
                 } else if (selectedAddItem.replace("acl", "") > 0) {
                     document.getElementById(selectedAddItem).classList.remove("selectedAdd");
                     selectedAddItem = selectedAddItem.replace("acl", "");
                     selectedAddItem -= 1;
                     selectedAddItem = ("acl" + selectedAddItem);
                     document.getElementById(selectedAddItem).classList.add("selectedAdd");
+                    if (document.getElementById("autoScroll").checked) {
+                        document.getElementById(selectedAddItem).scrollIntoView({behavior: "smooth", block: "end"});
+                    }
                 }
                 break;
                 
             //down arrow
             case 40:
-                if (!conInsp && selectedPlyItem < uiLdPly.plyitems.length - 1) {
+                event.preventDefault();
+                if (event.ctrlKey) {
+                    mvItem(1);
+                } else if (event.altKey) {
+                    var whatWillScroll;
+                    if (!conInsp) {
+                        whatWillScroll = document.getElementById("plyViWr");
+                    } else {
+                        whatWillScroll = document.getElementById("inspWr");
+                    }
+                    whatWillScroll.scrollTo({top: whatWillScroll.scrollTop + 200, behavior: "smooth"});
+                } else if (!conInsp && selectedPlyItem < uiLdPly.plyitems.length - 1) {
                     document.getElementById(selectedPlyItem).classList.remove("selectedPlyIt");
                     selectedPlyItem -= -1;
                     document.getElementById(selectedPlyItem).classList.add("selectedPlyIt");
+                    if (document.getElementById("autoScroll").checked) {
+                        document.getElementById(selectedPlyItem).scrollIntoView({behavior: "smooth", block: "end"});
+                    }
                 } else if (selectedAddItem.replace("acl", "") < availableClips.data.length - 1) {
                     document.getElementById(selectedAddItem).classList.remove("selectedAdd");
                     selectedAddItem = selectedAddItem.replace("acl", "");
                     selectedAddItem -= -1;
                     selectedAddItem = ("acl" + selectedAddItem);
                     document.getElementById(selectedAddItem).classList.add("selectedAdd");
+                    if (document.getElementById("autoScroll").checked) {
+                        document.getElementById(selectedAddItem).scrollIntoView({behavior: "smooth", block: "end"});
+                    }
                 }
                 break;
                 
@@ -375,7 +467,25 @@
                     conInsp = false;
                 }
                 break;
+                
+            //delete
+            case 46:
+                deleteItemFromPly();
+                break;
             
+            //escape
+            case 27:
+                conInsp = false;
+                break;
+                
+            //ctrl + s
+            case 83:
+                if (event.ctrlKey) {
+                    savePly();
+                }
+                break;
+            case 76:
+                document.getElementById("autoScroll").checked = !document.getElementById("autoScroll").checked;
         }
     }, true);
     
