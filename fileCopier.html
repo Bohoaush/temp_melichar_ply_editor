@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>temp melichar ply editor</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        body {
+            background-color: #121212;
+            color: #CCCCCC;
+        }
+    </style>
+</head>
+<body>
+<div id="button-panel">
+    <a href=".."><input id="save" type="button" value="Return to playlist editor"></a>
+</div>
+<hr>
+<div id="acti-por">
+    <div id="wantfiles">
+        <input id="wfe" type="text">
+        <input id="saveWfe" type="button" value="SAVE">
+    </div>
+    <div id="logView">
+        
+    </div>
+</div>
+</body>
+</html>
+
+<script>
+    var myUrl = (window.location.protocol + "//" + window.location.hostname + ":" + window.location.port);
+
+    document.getElementById("wfe") = httpGet(myUrl + "/getWantfiles");
+    
+    $("#saveWfe").click(function() {
+        httpPost(myUrl + "/pushWantfiles", JSON.stringify(document.getElementById("wfe")));
+    }
+    
+    document.getElementById("logView").innerHTML = httpGet(myUrl + "/copylog");
+    
+    
+    function httpGet(url) {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "GET", url, false );
+        xmlHttp.send( null );
+        return xmlHttp.responseText;
+    }
+    
+    function httpPost(url, data) {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("POST", url, false);
+        xmlHttp.send(data);
+        return xmlHttp.responseText;
+    }
+</script>

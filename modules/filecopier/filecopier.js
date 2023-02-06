@@ -22,13 +22,17 @@ var copiedFiles = [];
 var erroredFiles = [];
 var unavailFiles = [];
 
-Promise.all([readWanted(), scanDir(workdir), readCopiedInfo()]).then(() => {
-    if (process.argv[2] == "delete") {
-        compareDelete();
-    } else {
-        compareCopy();
-    }
-});
+module.exports = {};
+
+module.exports.copyOrDelete(func) {
+    Promise.all([readWanted(), scanDir(workdir), readCopiedInfo()]).then(() => {
+        if (func == "delete") {
+            compareDelete();
+        } else if (func == "copy") {
+            compareCopy();
+        }
+    });
+}
 
 function readWanted() {
     return new Promise(resolve => {
