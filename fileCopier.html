@@ -17,7 +17,7 @@
 <hr>
 <div id="acti-por">
     <div id="wantfiles">
-        <input id="wfe" type="text">
+        <textarea id="wfe" rows="40" cols="150"></textarea>
         <input id="saveWfe" type="button" value="SAVE">
     </div>
     <div id="logView">
@@ -30,14 +30,24 @@
 <script>
     var myUrl = (window.location.protocol + "//" + window.location.hostname + ":" + window.location.port);
 
-    document.getElementById("wfe") = httpGet(myUrl + "/getWantfiles");
+    document.getElementById("wfe").value = httpGet(myUrl + "/getWantfiles");
     
     $("#saveWfe").click(function() {
-        httpPost(myUrl + "/pushWantfiles", JSON.stringify(document.getElementById("wfe")));
-    }
+        saveWantfiles();
+    });
     
     document.getElementById("logView").innerHTML = httpGet(myUrl + "/copylog");
     
+    document.addEventListener('keydown', function(event) {
+        if (event.keyCode == 83 && event.ctrlKey) {
+            saveWantfiles();
+            event.preventDefault();
+        }
+    });
+    
+    function saveWantfiles() {
+        httpPost(myUrl + "/pushWantfiles", document.getElementById("wfe").value);
+    }
     
     function httpGet(url) {
         var xmlHttp = new XMLHttpRequest();

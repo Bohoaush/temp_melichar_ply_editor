@@ -62,6 +62,64 @@ http.createServer(async function (req, res) {
             });
             break;
             
+        case "/copy":
+            fs.readFile("fileCopier.html", function(err, data) {
+                if (err) {
+                    res.writeHead(500);
+                    res.end();
+                } else {
+                    res.writeHead(200, {'Content-Type': 'text/html'});
+                    res.write(data);
+                    res.end();
+                }
+            });
+            break;
+            
+        case "/copylog":
+            fs.readFile("modules/filecopier/copylog.txt", function(err, data) {
+                if (err) {
+                    res.writeHead(500);
+                    res.end();
+                } else {
+                    res.writeHead(200, {'Content-Type': 'text/html'});
+                    res.write(data);
+                    res.end();
+                }
+            });
+            break;
+            
+        case "/getWantfiles":
+            fs.readFile("modules/filecopier/wantfiles.list", function(err, data) {
+                if (err) {
+                    res.writeHead(500);
+                    res.end();
+                } else {
+                    res.writeHead(200, {'Content-Type': 'text/html'});
+                    res.write(data);
+                    res.end();
+                }
+            });
+            break;
+            
+        case "/pushWantfiles":
+            var newWantfiles = "";
+            req.on('data', function(data) {
+                newWantfiles += data;
+            });
+            req.on('end', function() {
+                fs.writeFile("modules/filecopier/wantfiles.list", newWantfiles, (err) => {
+                    if (err) {
+                        res.writeHead(500);
+                        res.end();
+                    } else {
+                        res.writeHead(200, {'Content-Type': 'text/html'});
+                        res.write(newWantfiles);
+                        res.end();
+                    }
+                });
+            });
+            break;
+            
         case "/copyfile":
             //TODO
             break;
