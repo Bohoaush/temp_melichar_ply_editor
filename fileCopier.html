@@ -13,6 +13,8 @@
 <body>
 <div id="button-panel">
     <a href=".."><input id="save" type="button" value="Return to playlist editor"></a>
+    <input id="startCopy" type="button" value="COPY">
+    <input id="startDelete" type="button" value="DELETE">
 </div>
 <hr>
 <div id="acti-por">
@@ -31,6 +33,14 @@
     var myUrl = (window.location.protocol + "//" + window.location.hostname + ":" + window.location.port);
 
     document.getElementById("wfe").value = httpGet(myUrl + "/getWantfiles");
+    
+    $("#startCopy").click(function() {
+        httpGet(myUrl + "/copierCopy");
+    });
+    
+    $("#startDelete").click(function() {
+        httpGet(myUrl + "/copierDelete");
+    });
     
     $("#saveWfe").click(function() {
         saveWantfiles();

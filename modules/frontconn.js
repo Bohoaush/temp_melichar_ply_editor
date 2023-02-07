@@ -3,6 +3,7 @@ var fs = require("fs");
 
 var fileinfo = require("./fileinform.js");
 var filehandle = require("./filehandler.js");
+var filecopier = require("./filecopier/filecopier.js");
 
 http.createServer(async function (req, res) {
     switch(req.url) {
@@ -76,11 +77,12 @@ http.createServer(async function (req, res) {
             break;
             
         case "/copylog":
-            fs.readFile("modules/filecopier/copylog.txt", function(err, data) {
+            fs.readFile("modules/filecopier/copylog.txt", 'utf-8', function(err, data) {
                 if (err) {
                     res.writeHead(500);
                     res.end();
                 } else {
+                    data = data.replaceAll("\n", "<br>");
                     res.writeHead(200, {'Content-Type': 'text/html'});
                     res.write(data);
                     res.end();
@@ -118,6 +120,17 @@ http.createServer(async function (req, res) {
                     }
                 });
             });
+            break;
+            
+        case "/copierCopy":
+            filecopier.copyOrDelete("copy");
+            res.writeHead(200);
+            res.end();
+            break;
+        case "/copierDelete":
+            filecopier.copyOrDelete("delete");
+            res.writeHead(200);
+            res.end();
             break;
             
         case "/copyfile":
