@@ -114,6 +114,8 @@
     var selectedPlyItem = -1;
     var selectedAddItem = -1;
     
+    var curLdPlyName;
+    
     $("#updInsp").click(function() {
         updateInspector();
     });
@@ -235,7 +237,7 @@
     });
     
     function savePly() {
-        let savefilename = window.prompt("Playlist name:", "playlist_yyyymmdd.ply");
+        let savefilename = window.prompt("Playlist name:", curLdPlyName || "playlist_yyyymmdd.ply");
         if (savefilename != null && savefilename != "") {
             if (!savefilename.match(/\.ply$/)) {
                 savefilename = savefilename + ".ply";
@@ -278,6 +280,7 @@
                 uiLdPly.plyitems[i].startTime = (uiLdPly.plyitems[i-1].startTime + (uiLdPly.plyitems[i-1].duration*1000));
             }
             drawPlaylist();
+            curLdPlyName = plyToLoadList.value;
         } else {
             alert("You need to specify filename to load!");
         }
