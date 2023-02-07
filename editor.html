@@ -465,8 +465,13 @@
             //enter
             case 13:
                 if (conInsp) {
-                    insSelToPly();
-                    conInsp = false;
+                    if (event.ctrlKey) {
+                        addSelToPly();
+                        conInsp = false;
+                    } else {
+                        insSelToPly();
+                        conInsp = false;
+                    }
                 }
                 break;
                 
