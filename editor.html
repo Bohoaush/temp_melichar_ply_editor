@@ -342,12 +342,11 @@
     
     function deleteItemFromPly() {
         if (selectedPlyItem != -1) {
+            delete uiLdPly.plyitems[selectedPlyItem];
             if (selectedPlyItem == (uiLdPly.plyitems.length - 1) && selectedPlyItem > 0) {
-                document.getElementById(selectedPlyItem).classList.remove("selectedPlyIt");
                 selectedPlyItem -= 1;
                 document.getElementById(selectedPlyItem).classList.add("selectedPlyIt");
             }
-            delete uiLdPly.plyitems[selectedPlyItem];
             uiLdPly.plyitems = uiLdPly.plyitems.filter(aplit => aplit !== null);
             for (let i = selectedPlyItem; i < uiLdPly.plyitems.length; i++) {
                 uiLdPly.plyitems[i].id = i;
