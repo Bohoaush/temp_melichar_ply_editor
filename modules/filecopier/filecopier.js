@@ -22,9 +22,17 @@ var copiedFiles = [];
 var erroredFiles = [];
 var unavailFiles = [];
 
+var copyingAt;
+
 module.exports = {};
 
 module.exports.copyOrDelete = function(func) {
+    wantFiles = [];
+    hasFiles = [];
+    erroredFiles = [];
+    unavailFiles = [];
+    copyingAt = -1;
+    //copiedFiles is overwritten from file each run, therefore nulling is unnecessary
     Promise.all([readWanted(), scanDir(workdir), readCopiedInfo()]).then(() => {
         if (func == "delete") {
             compareDelete();
@@ -36,6 +44,7 @@ module.exports.copyOrDelete = function(func) {
 
 function readWanted() {
     return new Promise(resolve => {
+        wantFiles = [];
         var readWantedFilesOneByOne = readline.createInterface({
             input: fs.createReadStream("modules/filecopier/wantfiles.list"),
             crlfDelay: Infinity
@@ -102,76 +111,85 @@ function readCopiedInfo() {
 
 
 function compareCopy() {
-    for (wafle of wantFiles) {
-        if (!fs.existsSync(workdir + wafle)) {
-            if (fs.existsSync(mntdir + wafle)) {
-                copiedFiles.push(wafle);
-                console.log("copying " + wafle);
-                fs.appendFile("modules/filecopier/copylog.txt", "copying " + wafle + "\n", (err) => {
-                    if (err) {
-                        console.log(err);
-                        fs.appendFile("modules/filecopier/copylog.txt", err + "\n", (err) => {
-                            if (err) {
-                                console.log(err);
-                            }
-                        });
-                    }
-                });
-                try {
-                	fs.copyFileSync(mntdir + wafle, workdir + wafle)
-                	console.log("copied " + wafle);
-                    fs.appendFile("modules/filecopier/copylog.txt", "copied " + wafle + "\n", (err) => {
+    return new Promise(resolve => {
+        copyingAt++;
+        if (copyingAt < wantFiles.length) {
+            wafle = wantFiles[copyingAt];
+            if (!fs.existsSync(workdir + wafle)) {
+                if (fs.existsSync(mntdir + wafle)) {
+                    // copiedFiles.push(wafle); // WRONG!
+                    console.log("copying " + wafle);
+                    fs.appendFile("modules/filecopier/copylog.txt", "copying " + wafle + "\n", (err) => {
+                        if (err) {
+                            console.log(err);
+                            fs.appendFile("modules/filecopier/copylog.txt", err + "\n", (err) => {
+                                if (err) {
+                                    console.log(err);
+                                }
+                            });
+                        }
+                    });
+                    fs.copyFile(mntdir + wafle, workdir + wafle, (err) => {
+                        if (err) {
+                            console.log(err);
+                            fs.appendFile("modules/filecopier/copylog.txt", err + "\n", (err) => {
+                                if (err) {
+                                    console.log(err);
+                                }
+                            });
+                            erroredFiles.push(wafle);
+                        } else {
+                            copiedFiles.push(wafle);
+                            console.log("copied " + wafle);
+                            fs.appendFile("modules/filecopier/copylog.txt", "copied " + wafle + "\n", (err) => {
+                                if (err) {
+                                    console.log(err);
+                                }
+                            });
+                            compareCopy();
+                        }
+                    });
+                } else {
+                    console.log(wafle + " doesn't exist");
+                    fs.appendFile("modules/filecopier/copylog.txt", wafle + " doesn't exist\n", (err) => {
                         if (err) {
                             console.log(err);
                         }
                     });
-                } catch(err) {
-	                console.log(err);
-                    fs.appendFile("modules/filecopier/copylog.txt", err + "\n", (err) => {
-                        if (err) {
-                            console.log(err);
-                        }
-                    });
-	                erroredFiles.push(wafle);
+                    unavailFiles.push(wafle);
                 }
-            } else {
-            	console.log(wafle + " doesn't exist");
-                fs.appendFile("modules/filecopier/copylog.txt", wafle + " doesn't exist\n", (err) => {
-                    if (err) {
-                        console.log(err);
-                    }
-                });
-            	unavailFiles.push(wafle);
             }
-        }
-    }
-    fs.writeFile("modules/filecopier/copyfile.info", JSON.stringify(copiedFiles), (err) => {
-        if (err) {
-            console.log(err);
-            fs.appendFile("copylog.txt", err + "\n", (err) => {
+        } else {
+            fs.writeFile("modules/filecopier/copyfile.info", JSON.stringify(copiedFiles), (err) => {
                 if (err) {
                     console.log(err);
+                    fs.appendFile("copylog.txt", err + "\n", (err) => {
+                        if (err) {
+                            console.log(err);
+                        }
+                    });
                 }
             });
+            if (unavailFiles.length > 0) {
+                console.log(unavailFiles + " are not available");
+                fs.appendFile("modules/filecopier/copylog.txt", unavailFiles + " are not available\n", (err) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+            }
+            if (erroredFiles.length > 0) {
+                console.log("_________________________________");
+                console.log(erroredFiles + " had errors during copy!");
+                fs.appendFile("modules/filecopier/copylog.txt", "___________________________________\n" + erroredFiles + " had errors during copy\n", (err) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+            }
         }
+        resolve();
     });
-    if (unavailFiles.length > 0) {
-    	console.log(unavailFiles + " are not available");
-        fs.appendFile("modules/filecopier/copylog.txt", unavailFiles + " are not available\n", (err) => {
-            if (err) {
-                console.log(err);
-            }
-        });
-    }
-    if (erroredFiles.length > 0) {
-    	console.log("_________________________________");
-    	console.log(erroredFiles + " had errors during copy!");
-        fs.appendFile("modules/filecopier/copylog.txt", "___________________________________\n" + erroredFiles + " had errors during copy\n", (err) => {
-            if (err) {
-                console.log(err);
-            }
-        });
-    }
 }
 
 function compareDelete() {
