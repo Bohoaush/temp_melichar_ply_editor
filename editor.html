@@ -90,7 +90,7 @@
         playlist
         <table id="ply-view">
             <thead>
-                <tr><th>start time</th><th>duration</th><th>path</th></tr>
+                <tr><th>start time</th><th>duration</th><th>path</th><th>logo</th></tr>
             </thead>
             <tbody id="plyitemstbl">
                 
@@ -114,6 +114,7 @@
 <script>
     var uiLdPly = {plyitems:[]};
     var availableClips;
+    var availableLogos;
 
     var myUrl = (window.location.protocol + "//" + window.location.hostname + ":" + window.location.port);
     
@@ -132,8 +133,12 @@
         availableClips = JSON.parse(httpGet(myUrl + "/clips"));
         if (availableClips.status = "ok") {
             var clipToWriteToInsp = "";
+            availableLogos = [];
             for (var i = 0; i < availableClips.data.length; i++) {
                 clipToWriteToInsp += ("<tr class=\"avClipTblItem\" id=\"acl" + i + "\"><td>" + availableClips.data[i].name + "</td><td>" + availableClips.data[i].duration + "</td></tr>");
+                if (availableClips.data[i].name.match(/\.png$/) || availableClips.data[i].name.match(/\.bmp$/) || availableClips.data[i].name.match(/\.tga$/)) {
+                    availableLogos.push(availableClips.data[i].name);
+                }
             }
             document.getElementById("avaClipTabl").innerHTML = clipToWriteToInsp;
             $(".avClipTblItem").click(function(){
@@ -171,7 +176,7 @@
             var plitDurDisp = plitDurHour + ":" + plitDurMinu + ":" + plitDurSeco;
             
             
-            plyToDraw += ("\" id=\"" + i + "\"><td>" + startTimeString + "</td><td>" + plitDurDisp + "</td><td>" + uiLdPly.plyitems[i].path + "</td></tr>");
+            plyToDraw += ("\" id=\"" + i + "\"><td>" + startTimeString + "</td><td>" + plitDurDisp + "</td><td>" + uiLdPly.plyitems[i].path + "</td><td><select class=\"logosel\" id=\"logo" + i + "\"><option value=\"" + uiLdPly.plyitems[i].logo + "\">" + uiLdPly.plyitems[i].logo + "</option></select></td></tr>");
         }
         document.getElementById("plyitemstbl").innerHTML = plyToDraw;
         if (selectedPlyItem != -1) {
@@ -185,6 +190,20 @@
             selectedPlyItem = this.id;
             document.getElementById(selectedPlyItem).classList.add("selectedPlyIt");
         });
+        $(".logosel").focus(function() {
+            var choselogo = "<option class=\"logoopt\" value=\"default\">default</option>";
+            for (avalogo of availableLogos) {
+                avalogo = avalogo.replace("loga_plus/", "");
+                choselogo += "<option class=\"logoopt\" value=\"" + avalogo + "\">" + avalogo + "</option>"
+            }
+            this.innerHTML = choselogo;
+            var idtochangelogo = this.id.replace("logo", "");
+            $(".logoopt").click(function() {
+                uiLdPly.plyitems[idtochangelogo].logo = this.value;
+                console.log(this.value);
+            });
+        });
+        
     }
     
     $("#insert").click(function() {
