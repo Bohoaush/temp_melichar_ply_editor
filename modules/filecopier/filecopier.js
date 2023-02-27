@@ -146,8 +146,8 @@ function compareCopy() {
                                     console.log(err);
                                 }
                             });
-                            compareCopy();
                         }
+                        compareCopy();
                     });
                 } else {
                     console.log(wafle + " doesn't exist");
@@ -157,7 +157,10 @@ function compareCopy() {
                         }
                     });
                     unavailFiles.push(wafle);
+                    compareCopy();
                 }
+            } else {
+                compareCopy();
             }
         } else {
             fs.writeFile("modules/filecopier/copyfile.info", JSON.stringify(copiedFiles), (err) => {
@@ -226,27 +229,27 @@ function compareDelete() {
 
 function executeDelete(toDelete) {
     return new Promise(resolve => {
-        fs.unlink(workdir + toDelete, (err) => {
-            if (err) {
-                console.log(err);
-                fs.appendFile("modules/filecopier/copylog.txt", err, (err) => {
-                    if (err) {
-                        console.log(err);
-                    }
-                });
-            } else {
-                console.log("deleted " + toDelete);
-                fs.appendFile("modules/filecopier/copylog.txt", "deleted " + toDelete + "\n", (err) => {
-                    if (err) {
-                        console.log(err);
-                    }
-                });
-                for (cofldl of copiedFiles) {
-                    if (toDelete == cofldl) {
-                        copiedFiles[copiedFiles.indexOf(cofldl)] = null;
-                    }
+        fs.promises.unlink(workdir + toDelete).then(() => {
+            console.log("deleted " + toDelete);
+            fs.appendFile("modules/filecopier/copylog.txt", "deleted " + toDelete + "\n", (err) => {
+                if (err) {
+                    console.log(err);
+                }
+            });
+            for (cofldl of copiedFiles) {
+                if (toDelete == cofldl) {
+                    copiedFiles[copiedFiles.indexOf(cofldl)] = null;
                 }
             }
+        }).catch((err) => {
+            console.log(err);
+            fs.appendFile("modules/filecopier/copylog.txt", err, (err) => {
+                if (err) {
+                    console.log(err);
+                }
+            });
+            
+        }).finally(() => {;
             resolve();
         });
     });
