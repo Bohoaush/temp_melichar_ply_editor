@@ -138,7 +138,8 @@
             var clipToWriteToInsp = "";
             availableLogos = [];
             for (var i = 0; i < availableClips.data.length; i++) {
-                clipToWriteToInsp += ("<tr class=\"avClipTblItem\" id=\"acl" + i + "\"><td>" + (availableClips.data[i].name).replace("aaavyplne", "_0vyplne") + "</td><td>" + availableClips.data[i].duration + "</td></tr>");
+                availableClips.data[i].name = (availableClips.data[i].name).replace("aaavyplne", "_0vyplne");
+                clipToWriteToInsp += ("<tr class=\"avClipTblItem\" id=\"acl" + i + "\"><td>" + availableClips.data[i].name + "</td><td>" + availableClips.data[i].duration + "</td></tr>");
                 if (availableClips.data[i].name.match(/\.png$/) || availableClips.data[i].name.match(/\.bmp$/) || availableClips.data[i].name.match(/\.tga$/)) {
                     availableLogos.push(availableClips.data[i].name);
                 }
