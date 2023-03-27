@@ -22,10 +22,9 @@ http.createServer(async function (req, res) {
             
         case "/clips":
             var retObj = {}
-            fileinfo.ccgtunnel.cls().then(retCls => {
+            fileinfo.getMediaCls().then(retCls => {
                 retObj.status = "ok";
-                console.log(retCls);
-                retObj.data = retCls.response.data;
+                retObj.data = retCls;
                 res.write(JSON.stringify(retObj));
                 res.end();
                 console.log(retObj);
