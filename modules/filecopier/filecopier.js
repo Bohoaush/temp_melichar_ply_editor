@@ -71,7 +71,7 @@ function scanDir(dir) {
         fs.readdir(dir, {withFileTypes: true}, (err, filenames) => {
             if (err) {
                 console.log(err)
-                fs.appendFile("modules/filecopier/copylog.txt", err + "\n", (err) => {
+                fs.appendFile("modules/filecopier/copylog.txt", err.toString() + "\n", (err) => {
                     if (err) {
                         console.log(err);
                     }
@@ -95,7 +95,7 @@ function readCopiedInfo() {
         fs.readFile("modules/filecopier/copyfile.info", "utf-8", (err, data) => {
             if (err) {
                 console.log(err);
-                fs.appendFile("modules/filecopier/copylog.txt", err + "\n", (err) => {
+                fs.appendFile("modules/filecopier/copylog.txt", err.toString() + "\n", (err) => {
                     if (err) {
                         console.log(err);
                     }
@@ -122,7 +122,7 @@ function compareCopy() {
                     fs.appendFile("modules/filecopier/copylog.txt", "copying " + wafle + "\n", (err) => {
                         if (err) {
                             console.log(err);
-                            fs.appendFile("modules/filecopier/copylog.txt", err + "\n", (err) => {
+                            fs.appendFile("modules/filecopier/copylog.txt", err.toString() + "\n", (err) => {
                                 if (err) {
                                     console.log(err);
                                 }
@@ -132,7 +132,7 @@ function compareCopy() {
                     fs.copyFile(mntdir + wafle, workdir + wafle, (err) => {
                         if (err) {
                             console.log(err);
-                            fs.appendFile("modules/filecopier/copylog.txt", err + "\n", (err) => {
+                            fs.appendFile("modules/filecopier/copylog.txt", err.toString() + "\n", (err) => {
                                 if (err) {
                                     console.log(err);
                                 }
@@ -166,7 +166,7 @@ function compareCopy() {
             fs.writeFile("modules/filecopier/copyfile.info", JSON.stringify(copiedFiles), (err) => {
                 if (err) {
                     console.log(err);
-                    fs.appendFile("copylog.txt", err + "\n", (err) => {
+                    fs.appendFile("copylog.txt", err.toString() + "\n", (err) => {
                         if (err) {
                             console.log(err);
                         }
@@ -216,7 +216,7 @@ function compareDelete() {
         fs.writeFile("modules/filecopier/copyfile.info", JSON.stringify(copiedFiles), (err) => {
             if (err) {
                 console.log(err);
-                fs.appendFile("modules/filecopier/copylog.txt", err, (err) => {
+                fs.appendFile("modules/filecopier/copylog.txt", err.toString(), (err) => {
                     if (err) {
                         console.log(err);
                     }
@@ -243,7 +243,7 @@ function executeDelete(toDelete) {
             }
         }).catch((err) => {
             console.log(err);
-            fs.appendFile("modules/filecopier/copylog.txt", err, (err) => {
+            fs.appendFile("modules/filecopier/copylog.txt", err.toString(), (err) => {
                 if (err) {
                     console.log(err);
                 }
