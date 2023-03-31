@@ -14,7 +14,7 @@ function getMediaCls() {
                     data[i] = data[i].split("  ");
                     data[i][2] = data[i][2].split(" ");
                     data[i][2][3] = data[i][2][3].split("/");
-                    data[i].name = (data[i][0]).replace("\"", "");
+                    data[i].name = (data[i][0]).replace(/\"/g, "");
                     data[i].duration = (data[i][2][2] * (data[i][2][3][0]/data[i][2][3][1]));
                     let avaClip = {name: data[i].name, duration: data[i].duration};
                     availableClips.push(avaClip);
