@@ -367,9 +367,9 @@
             sendPlyObj.name = savefilename;
             let saveStatus = httpPost(myUrl + "/save", JSON.stringify(sendPlyObj));
             curLdPlyName = savefilename;
-            unsavedChanges = false;
             if (saveStatus.status == "ok") {
                 updateStatus("ok", "Playlist saved successfully");
+                unsavedChanges = false;
             } else {
                 updateStatus("err", "Failed to save playlist!");
             }
