@@ -59,6 +59,47 @@ function copyPlyTo(filename, destination) {
 }
 
 
+setSettings();
+
+function setSettings() {
+    return new Promise((resolve, reject) => {
+        fs.readFile("./settings.json", function(err, data) {
+            if (err) {
+                console.log(err);
+            }
+            if (data != null) {
+                module.exports.settings = JSON.parse(data);
+                resolve();
+            } else {
+                reject();
+            }
+        });
+    }).catch(err => {
+        console.log(err || "Unable to read settings");
+        return new Promise((resolve, reject) => {
+            module.exports.settings = {
+                http_port: 8087,
+                http_pass: "1234567",
+                filecop_mnt: "../../",
+                filecop_ori: "../",
+                filecop_wrk: "../"
+            }
+            if (!fs.existsSync("./settings.json")) {
+                fs.writeFile("./settings.json", JSON.stringify(module.exports.settings), (err) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
+                });
+            }
+        }).catch(err => {
+            console.log(err);
+        });
+    });
+}
+
+
 module.exports = {
     writePlyToFile,
     listAvailablePlys,

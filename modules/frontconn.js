@@ -6,7 +6,6 @@ var filehandle = require("./filehandler.js");
 var filecopier = require("./filecopier/filecopier.js");
 
 var authenticatedTokens = [];
-var password = 123456;
 
 function createToken() {
     let newToken = "aaabbbb";
@@ -25,7 +24,7 @@ function expireToken(token) {
 
 function authenticate(sentPass) {
     return new Promise((resolve, reject) => {
-        if (sentPass == password) {
+        if (sentPass == filehandle.settings.http_pass) {
             console.log("authenticated");
             resolve(createToken());
         } else {
@@ -51,6 +50,7 @@ function parseCookies (request) {
     return list;
 }
 
+setTimeout(function() {
 http.createServer(async function (req, res) {
     let currentAccessToken = (parseCookies(req)).token;
     let authenticated = false;
@@ -243,4 +243,5 @@ http.createServer(async function (req, res) {
             });
         }
     }
-}).listen(8087);
+}).listen(filehandle.settings.http_port);
+}, 1000);

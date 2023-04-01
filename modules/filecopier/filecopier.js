@@ -1,16 +1,18 @@
 var fs = require("fs");
 var readline = require("readline");
 
+var filehandle = require("../filehandler.js");
+
 
 //////////////////////////////////////////////////////////
 //////////////////USER-CONFIGURABLE///////////////////////
 //////////////////////////////////////////////////////////
 // Mounted remote folder containing wanted files
-var mntdir = "/home/bohoaush/Documents/testfs/pole-mnt/";
+/*var mntdir = "/home/bohoaush/Documents/testfs/pole-mnt/";
 // Original remote folder name to be replaced - use = mntdir for same directory in file and mounted
 var oridir = "\\\\W.X.Y.Z\\video\\"
 // Folder where you want files
-var workdir = "/home/bohoaush/Documents/testfs/local-fs/";
+var workdir = "/home/bohoaush/Documents/testfs/local-fs/";*/
 //////////////////////////////////////////////////////////
 //////////////END-OF-USER-CONFIGURABLE(///////////////////
 //////////////////////////////////////////////////////////
@@ -33,7 +35,7 @@ module.exports.copyOrDelete = function(func) {
     unavailFiles = [];
     copyingAt = -1;
     //copiedFiles is overwritten from file each run, therefore nulling is unnecessary
-    Promise.all([readWanted(), scanDir(workdir), readCopiedInfo()]).then(() => {
+    Promise.all([readWanted(), scanDir(filehandle.settings.filecop_wrk), readCopiedInfo()]).then(() => {
         if (func == "delete") {
             compareDelete();
         } else if (func == "copy") {
@@ -51,7 +53,7 @@ function readWanted() {
         });
 
         readWantedFilesOneByOne.on('line', (line) => {
-            line = line.replace(oridir, "");
+            line = line.replace(filehandle.settings.filecop_ori, "");
             line = line.replace(/\\/g, "/"); // Replace Windows-like backslash with forward slash
             if (!(Array.from(line)[0] == '#')) {
                 wantFiles.push(line);
@@ -81,7 +83,7 @@ function scanDir(dir) {
                     if (file.isDirectory()) {
                         subdirPromises.push(scanDir(dir + file.name));
                     } else {
-                        hasFiles.push(dir.replace(workdir, "") + file.name);
+                        hasFiles.push(dir.replace(filehandle.settings.filecop_wrk, "") + file.name);
                     }
                 }
             }
@@ -115,9 +117,8 @@ function compareCopy() {
         copyingAt++;
         if (copyingAt < wantFiles.length) {
             wafle = wantFiles[copyingAt];
-            if (!fs.existsSync(workdir + wafle)) {
-                if (fs.existsSync(mntdir + wafle)) {
-                    // copiedFiles.push(wafle); // WRONG!
+            if (!fs.existsSync(filehandle.settings.filecop_wrk + wafle)) {
+                if (fs.existsSync(filehandle.settings.filecop_mnt + wafle)) {
                     console.log("copying " + wafle);
                     fs.appendFile("modules/filecopier/copylog.txt", "copying " + wafle + "\n", (err) => {
                         if (err) {
@@ -129,7 +130,7 @@ function compareCopy() {
                             });
                         }
                     });
-                    fs.copyFile(mntdir + wafle, workdir + wafle, (err) => {
+                    fs.copyFile(filehandle.settings.filecop_mnt + wafle, filehandle.settings.filecop_wrk + wafle, (err) => {
                         if (err) {
                             console.log(err);
                             fs.appendFile("modules/filecopier/copylog.txt", err.toString() + "\n", (err) => {
@@ -206,7 +207,7 @@ function compareDelete() {
             }
         }
         if (!isWafle) {
-            if (fs.existsSync(workdir + cofle)) {
+            if (fs.existsSync(filehandle.settings.filecop_wrk + cofle)) {
                 deletePromises.push(executeDelete(cofle));
             }
         }
@@ -229,7 +230,7 @@ function compareDelete() {
 
 function executeDelete(toDelete) {
     return new Promise(resolve => {
-        fs.promises.unlink(workdir + toDelete).then(() => {
+        fs.promises.unlink(filehandle.settings.filecop_wrk + toDelete).then(() => {
             console.log("deleted " + toDelete);
             fs.appendFile("modules/filecopier/copylog.txt", "deleted " + toDelete + "\n", (err) => {
                 if (err) {
