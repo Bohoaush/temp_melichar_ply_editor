@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>temp melichar ply editor</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        body {
+            background-color: #121212;
+            color: #CCCCCC;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <input id="password" type="password" placeholder="password" required>
+    <button id="loginBtn">login</button>
+</div>
+</body>
+</html>
+
+<script>
+    var myUrl = (window.location.protocol + "//" + window.location.hostname + ":" + window.location.port);
+    
+    $("#loginBtn").click(function() {
+        httpPost(myUrl + "/login", document.getElementById("password").value);
+        location.reload();
+    });
+    
+    document.addEventListener('keydown', function(event) {
+        if (event.keyCode == 83 && event.ctrlKey) {
+            event.preventDefault();
+        }
+    });
+    
+    function httpGet(url) {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "GET", url, false );
+        xmlHttp.send( null );
+        return xmlHttp.responseText;
+    }
+    
+    function httpPost(url, data) {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("POST", url, false);
+        xmlHttp.send(data);
+        return xmlHttp.responseText;
+    }
+</script>

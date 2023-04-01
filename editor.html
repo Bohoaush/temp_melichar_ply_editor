@@ -86,6 +86,7 @@
     &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
     &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
     <a href="copy"><input id="gotoFilecopier" type="button" value="==>> GO TO FILE COPIER ==>>"></a>
+    <input id="signOut" type="button" value="Sign out">
 </div>
 <hr>
 <div id="acti-por">
@@ -125,6 +126,20 @@
     var selectedAddItem = -1;
     
     var curLdPlyName;
+
+    $("#signOut").click(function() {
+        httpGet(myUrl + "/logout");
+
+        const cookies = document.cookie.split(";");
+
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i];
+            const eqPos = cookie.indexOf("=");
+            const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+            document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        }
+        location.reload();
+    });
     
     $("#updInsp").click(function() {
         updateInspector();
@@ -542,6 +557,7 @@
     function httpGet(url) {
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.open( "GET", url, false );
+        xmlHttp.withCredentials = true;
         xmlHttp.send( null );
         return xmlHttp.responseText;
     }
@@ -549,6 +565,7 @@
     function httpPost(url, data) {
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.open("POST", url, false);
+        xmlHttp.withCredentials = true;
         xmlHttp.send(data);
         return xmlHttp.responseText;
     }
