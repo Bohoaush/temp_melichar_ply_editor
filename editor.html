@@ -102,7 +102,7 @@
         </table>
     </div>
     <div class="fixTableHead" id="inspWr">
-        available clips:
+        available clips:<div id="inspCtgContain"></div>
         <table id="inspector">
             <thead>
                 <tr><th>name</th><th>duration</th></tr>
@@ -119,6 +119,8 @@
     var uiLdPly = {plyitems:[]};
     var availableClips;
     var availableLogos;
+    var availClipCategories = [];
+    var currClipCategory = "";
 
     var myUrl = (window.location.protocol + "//" + window.location.hostname + ":" + window.location.port);
     
@@ -170,15 +172,35 @@
         availableClips = JSON.parse(httpGet(myUrl + "/clips"));
         if (availableClips.status = "ok") {
             var clipToWriteToInsp = "";
+            var clipCatToWrite = "<button class=\"ctgbtn\" value=\"\">root</button>";
+            availClipCategories = [];
             availableLogos = [];
             for (var i = 0; i < availableClips.data.length; i++) {
                 availableClips.data[i].name = (availableClips.data[i].name).replace("aaavyplne", "_0vyplne");
-                clipToWriteToInsp += ("<tr class=\"avClipTblItem\" id=\"acl" + i + "\"><td>" + availableClips.data[i].name + "</td><td>" + availableClips.data[i].duration + "</td></tr>");
+                if ((availableClips.data[i].name).match("\^" + currClipCategory + "\.*" + "/")) {
+                    let newcatg = (((availableClips.data[i].name.replace(currClipCategory, "")).split('/'))[0] + "/");
+                    for (clipcategory of availClipCategories) {
+                        if (newcatg == clipcategory) {
+                            newcatg = null;
+                            break;
+                        }
+                    }
+                    if (newcatg != null){
+                        newcatg = newcatg;
+                        availClipCategories.push(newcatg);
+                        clipCatToWrite += ("<button class=\"ctgbtn\" value=\"" + (currClipCategory + newcatg) + "\">" + newcatg + "</button>");
+                    }
+                }
+                if ((availableClips.data[i].name).match("\^" + currClipCategory)) {
+                    console.log(i + ": " + availableClips.data[i].name + " : " + currClipCategory);
+                    clipToWriteToInsp += ("<tr class=\"avClipTblItem\" id=\"acl" + i + "\"><td>" + availableClips.data[i].name + "</td><td>" + availableClips.data[i].duration + "</td></tr>");
+                }
                 if (availableClips.data[i].name.match(/\.png$/) || availableClips.data[i].name.match(/\.bmp$/) || availableClips.data[i].name.match(/\.tga$/)) {
                     availableLogos.push(availableClips.data[i].name);
                 }
             }
             document.getElementById("avaClipTabl").innerHTML = clipToWriteToInsp;
+            document.getElementById("inspCtgContain").innerHTML = clipCatToWrite;
             $(".avClipTblItem").click(function(){
                 conInsp = true;
                 if (selectedAddItem != -1) {
@@ -186,6 +208,10 @@
                 }
                 selectedAddItem = this.id;
                 document.getElementById(selectedAddItem).classList.add("selectedAdd");
+            });
+            $(".ctgbtn").click(function(){
+                currClipCategory = this.value;
+                updateInspector();
             });
         } else if (availableClips.status == "err") {
             //TODO
