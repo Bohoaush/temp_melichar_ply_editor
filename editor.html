@@ -59,6 +59,8 @@
     </style>
 </head>
 <body>
+<div id="status-view">
+</div>
 <div id="button-panel">
     <input id="save" type="button" value="SAVE">
     <select id="ldfilename"></select>
@@ -161,6 +163,21 @@
             location.reload();
         }
     });
+
+    function updateStatus(type, msg) {
+        let statusView = document.getElementById("status-view");
+        if (type == "ok") {
+            statusView.style.color = "green";
+            statusView.style.backgroundColor = "#DDFFDD";
+        } else if (type == "warn") {
+            statusView.style.color = "orange";
+            statusView.style.backgroundColor = "#FFFFEE";
+        } else {
+            statusView.style.color = "red";
+            statusView.style.backgroundColor = "#FFDDDD";
+        }
+        statusView.innerHTML = msg;
+    }
     
     $("#updInsp").click(function() {
         updateInspector();
@@ -170,7 +187,8 @@
     
     function updateInspector() {
         availableClips = JSON.parse(httpGet(myUrl + "/clips"));
-        if (availableClips.status = "ok") {
+        if (availableClips.status == "ok") {
+            console.log(availableClips.status);
             var clipToWriteToInsp = "";
             var wayBack = currClipCategory.split("/");
             wayBack = currClipCategory.replace((wayBack[wayBack.length - 2] + "/"), "");
@@ -204,6 +222,7 @@
             selectedAddItem = -1;
             document.getElementById("avaClipTabl").innerHTML = clipToWriteToInsp;
             document.getElementById("inspCtgContain").innerHTML = clipCatToWrite;
+            updateStatus("ok", "");
             $(".avClipTblItem").click(function(){
                 conInsp = true;
                 if (selectedAddItem != -1) {
@@ -217,7 +236,7 @@
                 updateInspector();
             });
         } else if (availableClips.status == "err") {
-            //TODO
+            updateStatus("err", "Unable to list available media! Is media-scanner running?");
         }
     }
     
@@ -346,9 +365,14 @@
             var sendPlyObj = {};
             sendPlyObj.ply = uiLdPly;
             sendPlyObj.name = savefilename;
-            httpPost(myUrl + "/save", JSON.stringify(sendPlyObj));
+            let saveStatus = httpPost(myUrl + "/save", JSON.stringify(sendPlyObj));
             curLdPlyName = savefilename;
             unsavedChanges = false;
+            if (saveStatus.status == "ok") {
+                updateStatus("ok", "Playlist saved successfully");
+            } else {
+                updateStatus("err", "Failed to save playlist!");
+            }
         } else {
             window.alert("You need to specify the filename!");
         }
@@ -621,10 +645,14 @@
     }
     
     function httpPost(url, data) {
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("POST", url, false);
-        xmlHttp.withCredentials = true;
-        xmlHttp.send(data);
-        return xmlHttp.responseText;
+        try {
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open("POST", url, false);
+            xmlHttp.withCredentials = true;
+            xmlHttp.send(data);
+            return xmlHttp.responseText;
+        } catch {
+            updateStatus("err", "Communication ERROR! Last action isn't on the back-end");
+        }
     }
 </script>

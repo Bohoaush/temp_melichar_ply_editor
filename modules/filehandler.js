@@ -50,6 +50,7 @@ function writePlyToFile(playlistObj, filename) {
     fs.writeFile("/mnt/Video/playlisty/" + filename, exportXml, (err) => {
         if (err) {
             console.log(err);
+            return err;
         }
     });
 }

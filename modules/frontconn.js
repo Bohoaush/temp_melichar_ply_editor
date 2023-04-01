@@ -66,13 +66,20 @@ http.createServer(async function (req, res) {
 
             case "/save":
                 var receivedData = "";
+                let saveRet = {};
                 req.on('data', function(data) {
                     receivedData += data;
                 });
                 req.on('end', function() {
                     receivedData = JSON.parse(receivedData);
-                    filehandle.writePlyToFile(receivedData.ply, (receivedData.name));
+                    let err = filehandle.writePlyToFile(receivedData.ply, (receivedData.name));
+                    if (err) {
+                        saveRet.status = "err";
+                    } else {
+                        saveRet.status = "ok";
+                    }
                 });
+                res.write(JSON.stringify(saveRet));
                 res.end();
                 break;
 
@@ -83,11 +90,12 @@ http.createServer(async function (req, res) {
                     retObj.data = retCls;
                     res.write(JSON.stringify(retObj));
                     res.end();
-                    console.log(retObj);
+                    console.log("ret: " + retObj);
                 }).catch(err => {
                     console.log(err);
                     retObj.status = "err";
                     retObj.data = JSON.stringify(err);
+                    res.write(JSON.stringify(retObj));
                     res.end();
                 });
                 break;
