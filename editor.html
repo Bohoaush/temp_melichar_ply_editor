@@ -172,7 +172,9 @@
         availableClips = JSON.parse(httpGet(myUrl + "/clips"));
         if (availableClips.status = "ok") {
             var clipToWriteToInsp = "";
-            var clipCatToWrite = "<button class=\"ctgbtn\" value=\"\">root</button>";
+            var wayBack = currClipCategory.split("/");
+            wayBack = currClipCategory.replace((wayBack[wayBack.length - 2] + "/"), "");
+            var clipCatToWrite = "<button class=\"ctgbtn\" value=\"\">root</button><button class=\"ctgbtn\" value=\"" + wayBack + "\">back</button>";
             availClipCategories = [];
             availableLogos = [];
             for (var i = 0; i < availableClips.data.length; i++) {
