@@ -126,19 +126,38 @@
     var selectedAddItem = -1;
     
     var curLdPlyName;
+    var unsavedChanges = false;
+
+    function confirmClose() {
+        if (unsavedChanges) {
+            console.log("unsaved changes");
+            return confirm("You have unsaved changes! Proceed?");
+        } else {
+            console.log("confirming close");
+            return true;
+        }
+    }
+
+    window.addEventListener("beforeunload", (event) => {
+        if (unsavedChanges) {
+            event.returnValue = "You have unsaved changes! Proceed?";
+        }
+    });
 
     $("#signOut").click(function() {
-        httpGet(myUrl + "/logout");
+        if (confirmClose()) {
+            httpGet(myUrl + "/logout");
 
-        const cookies = document.cookie.split(";");
+            const cookies = document.cookie.split(";");
 
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i];
-            const eqPos = cookie.indexOf("=");
-            const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-            document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i];
+                const eqPos = cookie.indexOf("=");
+                const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            }
+            location.reload();
         }
-        location.reload();
     });
     
     $("#updInsp").click(function() {
@@ -257,6 +276,7 @@
                 uiLdPly.plyitems[i].startTime = (uiLdPly.plyitems[i-1].startTime + (uiLdPly.plyitems[i-1].duration*1000));
             }
             drawPlaylist();
+            unsavedChanges = true;
         } else {
             addSelToPly();
         }
@@ -281,6 +301,7 @@
             itemToAdd.startTime = itemToAdd.startTime.setHours(6, 0, 0);
         }
         drawPlaylist();
+        unsavedChanges = true;
     }
     
     $("#save").click(function() {
@@ -298,6 +319,7 @@
             sendPlyObj.name = savefilename;
             httpPost(myUrl + "/save", JSON.stringify(sendPlyObj));
             curLdPlyName = savefilename;
+            unsavedChanges = false;
         } else {
             window.alert("You need to specify the filename!");
         }
@@ -320,24 +342,27 @@
     });
     
     function loadPly() {
-        let plyToLoadList = document.getElementById("ldfilename");
-        if (plyToLoadList.value != "" && plyToLoadList.value != null && plyToLoadList.value != undefined) {
-            console.log(plyToLoadList.value);
-            uiLdPly.plyitems = JSON.parse(httpPost((myUrl + "/open"), plyToLoadList.value));
-            uiLdPly.plyitems[0].id = 0;
-            uiLdPly.plyitems[0].startTime = new Date(Date.now());
-            uiLdPly.plyitems[0].startTime = uiLdPly.plyitems[0].startTime.setHours(6, 0, 0);
-            for (let i = 1; i < uiLdPly.plyitems.length; i++) {
-                uiLdPly.plyitems[i].id = i;
-                uiLdPly.plyitems[i].startTime = (uiLdPly.plyitems[i-1].startTime + (uiLdPly.plyitems[i-1].duration*1000));
+        if (confirmClose()) {
+            let plyToLoadList = document.getElementById("ldfilename");
+            if (plyToLoadList.value != "" && plyToLoadList.value != null && plyToLoadList.value != undefined) {
+                console.log(plyToLoadList.value);
+                uiLdPly.plyitems = JSON.parse(httpPost((myUrl + "/open"), plyToLoadList.value));
+                uiLdPly.plyitems[0].id = 0;
+                uiLdPly.plyitems[0].startTime = new Date(Date.now());
+                uiLdPly.plyitems[0].startTime = uiLdPly.plyitems[0].startTime.setHours(6, 0, 0);
+                for (let i = 1; i < uiLdPly.plyitems.length; i++) {
+                    uiLdPly.plyitems[i].id = i;
+                    uiLdPly.plyitems[i].startTime = (uiLdPly.plyitems[i-1].startTime + (uiLdPly.plyitems[i-1].duration*1000));
+                }
+                if (selectedPlyItem >= uiLdPly.plyitems.length) {
+                    selectedPlyItem = (uiLdPly.plyitems.length - 1);
+                }
+                drawPlaylist();
+                curLdPlyName = plyToLoadList.value;
+                unsavedChanges = false;
+            } else {
+                alert("You need to specify filename to load!");
             }
-            if (selectedPlyItem >= uiLdPly.plyitems.length) {
-                selectedPlyItem = (uiLdPly.plyitems.length - 1);
-            }
-            drawPlaylist();
-            curLdPlyName = plyToLoadList.value;
-        } else {
-            alert("You need to specify filename to load!");
         }
     }
     
@@ -366,6 +391,7 @@
                 uiLdPly.plyitems[i].startTime = (uiLdPly.plyitems[i-1].startTime + (uiLdPly.plyitems[i-1].duration*1000));
             }
             drawPlaylist();
+            unsavedChanges = true;
         } else {
             addDummyToPly();
         }
@@ -389,6 +415,7 @@
         }
         uiLdPly.plyitems.push(itemToAdd);
         drawPlaylist();
+        unsavedChanges = true;
     }
     
     $("#remove").click(function() {
@@ -413,6 +440,7 @@
                 }
             }
             drawPlaylist();
+            unsavedChanges = true;
         } else {
             window.alert("No item selected for deletion");
         }
@@ -443,6 +471,7 @@
                 }
             }
             drawPlaylist();
+            unsavedChanges = true;
         }
     } //TODO finish
     
