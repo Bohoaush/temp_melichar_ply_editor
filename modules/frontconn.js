@@ -65,22 +65,28 @@ http.createServer(async function (req, res) {
         switch(req.url) {
 
             case "/save":
-                var receivedData = "";
-                let saveRet = {};
-                req.on('data', function(data) {
-                    receivedData += data;
-                });
-                req.on('end', function() {
-                    receivedData = JSON.parse(receivedData);
-                    filehandle.writePlyToFile(receivedData.ply, (receivedData.name)).then(() => {
-                        saveRet.status = "ok";
-                    }).catch((err) => {
-                        saveRet.status = "err"
-                    }).finally(() => {
-                        res.write(JSON.stringify(saveRet));
-                        res.end();
+                if (filehandle.settings.allow_editor) {
+                    var receivedData = "";
+                    let saveRet = {};
+                    req.on('data', function(data) {
+                        receivedData += data;
                     });
-                });
+                    req.on('end', function() {
+                        receivedData = JSON.parse(receivedData);
+                        filehandle.writePlyToFile(receivedData.ply, (receivedData.name)).then(() => {
+                            saveRet.status = "ok";
+                        }).catch((err) => {
+                            saveRet.status = "err"
+                        }).finally(() => {
+                            res.write(JSON.stringify(saveRet));
+                            res.end();
+                        });
+                    });
+                } else {
+                    res.writeHead(403);
+                    res.write("Editor disabled");
+                    res.end();
+                }
                 break;
 
             case "/clips":
@@ -127,6 +133,7 @@ http.createServer(async function (req, res) {
                 break;
 
             case "/copy":
+                if (filehandle.settings.allow_copier) {
                 fs.readFile("fileCopier.html", function(err, data) {
                     if (err) {
                         res.writeHead(500);
@@ -137,6 +144,11 @@ http.createServer(async function (req, res) {
                         res.end();
                     }
                 });
+                } else {
+                    res.writeHead(403);
+                    res.write("File copier is disabled");
+                    res.end();
+                }
                 break;
 
             case "/copylog":
@@ -167,6 +179,7 @@ http.createServer(async function (req, res) {
                 break;
 
             case "/pushWantfiles":
+                if (filehandle.settings.allow_copier) {
                 var newWantfiles = "";
                 req.on('data', function(data) {
                     newWantfiles += data;
@@ -183,19 +196,36 @@ http.createServer(async function (req, res) {
                         }
                     });
                 });
+                } else {
+                    res.writeHead(403);
+                    res.write("File copier disabled");
+                    res.end();
+                }
                 break;
 
             case "/copierCopy":
-                filecopier.copyOrDelete("copy");
-                res.writeHead(200);
-                res.write("ok");
-                res.end();
+                if (filehandle.settings.allow_copier) {
+                    filecopier.copyOrDelete("copy");
+                    res.writeHead(200);
+                    res.write("ok");
+                    res.end();
+                } else {
+                    res.writeHead(403);
+                    res.write("File copier disabled");
+                    res.end();
+                }
                 break;
             case "/copierDelete":
-                filecopier.copyOrDelete("delete");
-                res.writeHead(200);
-                res.write("ok");
-                res.end();
+                if (filehandle.settings.allow_copier) {
+                    filecopier.copyOrDelete("delete");
+                    res.writeHead(200);
+                    res.write("ok");
+                    res.end();
+                } else {
+                    res.writeHead(403);
+                    res.write("File copier disabled");
+                    res.end();
+                }
                 break;
 
             case "/copyfile":
@@ -208,16 +238,22 @@ http.createServer(async function (req, res) {
                 break;
 
             default:
-                fs.readFile("editor.html", function(err, data) {
-                    if (err) {
-                        res.writeHead(500);
-                        res.end();
-                    } else {
-                        res.writeHead(200, {'Content-Type': 'text/html'});
-                        res.write(data);
-                        res.end();
-                    }
-                });
+                if (filehandle.settings.allow_editor) {
+                    fs.readFile("editor.html", function(err, data) {
+                        if (err) {
+                            res.writeHead(500);
+                            res.end();
+                        } else {
+                            res.writeHead(200, {'Content-Type': 'text/html'});
+                            res.write(data);
+                            res.end();
+                        }
+                    });
+                } else {
+                    res.writeHead(403);
+                    res.write("Editor is disabled");
+                    res.end();
+                }
                 break;
 
         }
