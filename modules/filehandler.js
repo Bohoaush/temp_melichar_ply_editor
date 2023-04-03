@@ -85,6 +85,8 @@ function setSettings() {
             module.exports.settings = {
                 http_port: 8087,
                 http_pass: "1234567",
+                allow_editor: true,
+                allow_copier: true,
                 filecop_mnt: "../../",
                 filecop_ori: "../",
                 filecop_wrk: "../"
