@@ -72,15 +72,15 @@ http.createServer(async function (req, res) {
                 });
                 req.on('end', function() {
                     receivedData = JSON.parse(receivedData);
-                    let err = filehandle.writePlyToFile(receivedData.ply, (receivedData.name));
-                    if (err) {
-                        saveRet.status = "err";
-                    } else {
+                    filehandle.writePlyToFile(receivedData.ply, (receivedData.name)).then(() => {
                         saveRet.status = "ok";
-                    }
+                    }).catch((err) => {
+                        saveRet.status = "err"
+                    }).finally(() => {
+                        res.write(JSON.stringify(saveRet));
+                        res.end();
+                    });
                 });
-                res.write(JSON.stringify(saveRet));
-                res.end();
                 break;
 
             case "/clips":
