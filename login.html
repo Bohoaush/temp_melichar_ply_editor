@@ -22,15 +22,20 @@
     var myUrl = (window.location.protocol + "//" + window.location.hostname + ":" + window.location.port);
     
     $("#loginBtn").click(function() {
-        httpPost(myUrl + "/login", document.getElementById("password").value);
-        location.reload();
+        login();
     });
     
     document.addEventListener('keydown', function(event) {
-        if (event.keyCode == 83 && event.ctrlKey) {
+        if (event.keyCode == 13) {
             event.preventDefault();
+            login();
         }
     });
+
+    function login() {
+        httpPost(myUrl + "/login", document.getElementById("password").value);
+        location.reload();
+    }
     
     function httpGet(url) {
         var xmlHttp = new XMLHttpRequest();
