@@ -188,11 +188,13 @@ http.createServer(async function (req, res) {
             case "/copierCopy":
                 filecopier.copyOrDelete("copy");
                 res.writeHead(200);
+                res.write("ok");
                 res.end();
                 break;
             case "/copierDelete":
                 filecopier.copyOrDelete("delete");
                 res.writeHead(200);
+                res.write("ok");
                 res.end();
                 break;
 

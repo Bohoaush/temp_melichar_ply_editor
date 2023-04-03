@@ -11,6 +11,8 @@
     </style>
 </head>
 <body>
+<div id="status-view">
+</div>
 <div id="button-panel">
     <a href=".."><input id="save" type="button" value="<<== Return to playlist editor <<=="></a>
     <input id="startCopy" type="button" value="COPY">
@@ -33,13 +35,39 @@
     var myUrl = (window.location.protocol + "//" + window.location.hostname + ":" + window.location.port);
 
     document.getElementById("wfe").value = httpGet(myUrl + "/getWantfiles");
+
+    function updateStatus(type, msg) {
+        let statusView = document.getElementById("status-view");
+        let currentTime = "";
+        if (msg != "") {
+            currentTime = (((new Date()).toString()).split(" GMT")[0] + ": ");
+        }
+        if (type == "ok") {
+            statusView.style.color = "green";
+            statusView.style.backgroundColor = "#DDFFDD";
+        } else if (type == "warn") {
+            statusView.style.color = "orange";
+            statusView.style.backgroundColor = "#FFFFEE";
+        } else {
+            statusView.style.color = "red";
+            statusView.style.backgroundColor = "#FFDDDD";
+        }
+        statusView.innerHTML = (currentTime + msg);
+    }
     
     $("#startCopy").click(function() {
-        httpGet(myUrl + "/copierCopy");
+        let res = httpGet(myUrl + "/copierCopy");
+        console.log(res);
+        if (res == "ok") {
+            updateStatus("ok", "Started copying...")
+        }
     });
     
     $("#startDelete").click(function() {
-        httpGet(myUrl + "/copierDelete");
+        let res = httpGet(myUrl + "/copierDelete");
+        if (res == "ok") {
+            updateStatus("ok", "Started deleting...");
+        }
     });
     
     $("#saveWfe").click(function() {
@@ -56,7 +84,12 @@
     });
     
     function saveWantfiles() {
-        httpPost(myUrl + "/pushWantfiles", document.getElementById("wfe").value);
+        let ret = httpPost(myUrl + "/pushWantfiles", document.getElementById("wfe").value);
+        if (ret == document.getElementById("wfe").value) {
+            updateStatus("ok", "Saved wanted-files");
+        } else {
+            updateStatus("err", "Failed to save wanted-files");
+        }
     }
     
     function httpGet(url) {
@@ -67,9 +100,13 @@
     }
     
     function httpPost(url, data) {
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("POST", url, false);
-        xmlHttp.send(data);
-        return xmlHttp.responseText;
+        try {
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open("POST", url, false);
+            xmlHttp.send(data);
+            return xmlHttp.responseText;
+        } catch {
+            updateStatus("err", "Communication ERROR! Last action isn't on backend.");
+        }
     }
 </script>
