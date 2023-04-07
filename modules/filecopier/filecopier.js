@@ -119,6 +119,12 @@ function compareCopy() {
                     let wafletracedir = wafle.match(/.*\//);
                     if (!fs.existsSync(wafletracedir)) {
                         fs.mkdirSync((filehandle.settings.filecop_wrk + wafletracedir), {recursive: true});
+                        console.log("created directory " + wafletracedir);
+                        fs.appendFile("modules/filecopier/copylog.txt", ("created directory " + wafletracedir) + "\n", (err) => {
+                            if (err) {
+                                console.log(err);
+                            }
+                        });
                     }
                     fs.copyFile(filehandle.settings.filecop_mnt + wafle, filehandle.settings.filecop_wrk + wafle, (err) => {
                         if (err) {
@@ -181,6 +187,12 @@ function compareCopy() {
                     }
                 });
             }
+            console.log("_____________COPYING FINISHED_____________");
+            fs.appendFile("modules/filecopier/copylog.txt", "_____________COPYING FINISHED_____________\n", (err) => {
+                if (err) {
+                    console.log(err);
+                }
+            });
         }
         resolve();
     });
