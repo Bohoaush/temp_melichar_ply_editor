@@ -32,16 +32,23 @@
         th {
             background: #111155;
         }
+        .even {
+            background-color: #222222;
+        }
+        .notafiller {
+            background-color: #222233;
+        }
         .selectedAdd {
             color: #000088;
             background-color: #BBBB00;
         }
-        .even {
-            background-color: #222222;
-        }
         .selectedPlyIt {
             color: #000088;
             background-color: #BBBB00;
+        }
+        .selectedPlyIt.notafiller {
+            background-color: #004747;
+            color: #FFFF00;
         }
         .dummy {
             background-color: red;
@@ -278,8 +285,13 @@
                     break;
                 }
             }
+
+            let fillerOrNot = "";
+            if (!((uiLdPly.plyitems[i].path).match("_0vyplne/"))) {
+                fillerOrNot = " notafiller";
+            }
             
-            plyToDraw += (dummyOrNot + "\" id=\"" + i + "\"><td>" + startTimeString + "</td><td>" + plitDurDisp + "</td><td>" + uiLdPly.plyitems[i].path + "</td><td><select class=\"logosel\" id=\"logo" + i + "\"><option value=\"" + uiLdPly.plyitems[i].logo + "\">" + uiLdPly.plyitems[i].logo + "</option></select></td></tr>");
+            plyToDraw += (dummyOrNot + fillerOrNot + "\" id=\"" + i + "\"><td>" + startTimeString + "</td><td>" + plitDurDisp + "</td><td>" + uiLdPly.plyitems[i].path + "</td><td><select class=\"logosel\" id=\"logo" + i + "\"><option value=\"" + uiLdPly.plyitems[i].logo + "\">" + uiLdPly.plyitems[i].logo + "</option></select></td></tr>");
         }
         document.getElementById("plyitemstbl").innerHTML = plyToDraw;
         if (selectedPlyItem != -1) {
