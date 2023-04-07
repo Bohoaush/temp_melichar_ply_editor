@@ -11,7 +11,11 @@ function loadPlyFromFile(filename) {
                 reject(err);
             } else {
                 var plyItemsArr = [];
-                for (let plyitem of xmlparser.parse(data).playlist.clip) {
+                let plyitems = xmlparser.parse(data).playlist.clip;
+                if (!(Symbol.iterator in plyitems)) {
+                    plyitems = [plyitems];
+                }
+                for (let plyitem of plyitems) {
                     var jsoitem = {}
                     jsoitem.path = plyitem['#text'].replace("/mnt/Video/", "");
                     jsoitem.duration = (plyitem['@_duration']/1000);
