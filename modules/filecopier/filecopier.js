@@ -4,20 +4,6 @@ var readline = require("readline");
 var filehandle = require("../filehandler.js");
 
 
-//////////////////////////////////////////////////////////
-//////////////////USER-CONFIGURABLE///////////////////////
-//////////////////////////////////////////////////////////
-// Mounted remote folder containing wanted files
-/*var mntdir = "/home/bohoaush/Documents/testfs/pole-mnt/";
-// Original remote folder name to be replaced - use = mntdir for same directory in file and mounted
-var oridir = "\\\\W.X.Y.Z\\video\\"
-// Folder where you want files
-var workdir = "/home/bohoaush/Documents/testfs/local-fs/";*/
-//////////////////////////////////////////////////////////
-//////////////END-OF-USER-CONFIGURABLE(///////////////////
-//////////////////////////////////////////////////////////
-
-
 var wantFiles = [];
 var hasFiles = [];
 var copiedFiles = [];
@@ -130,6 +116,10 @@ function compareCopy() {
                             });
                         }
                     });
+                    let wafletracedir = wafle.match(/.*\//);
+                    if (!fs.existsSync(wafletracedir)) {
+                        fs.mkdirSync((filehandle.settings.filecop_wrk + wafletracedir), {recursive: true});
+                    }
                     fs.copyFile(filehandle.settings.filecop_mnt + wafle, filehandle.settings.filecop_wrk + wafle, (err) => {
                         if (err) {
                             console.log(err);
