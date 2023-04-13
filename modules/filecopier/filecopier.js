@@ -117,7 +117,7 @@ function compareCopy() {
                         }
                     });
                     let wafletracedir = wafle.match(/.*\//);
-                    if (!fs.existsSync(wafletracedir)) {
+                    if (!fs.existsSync(filehandle.settings.filecop_wrk + wafletracedir)) {
                         fs.mkdirSync((filehandle.settings.filecop_wrk + wafletracedir), {recursive: true});
                         console.log("created directory " + wafletracedir);
                         fs.appendFile("modules/filecopier/copylog.txt", ("created directory " + wafletracedir) + "\n", (err) => {
