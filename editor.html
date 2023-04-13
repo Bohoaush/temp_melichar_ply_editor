@@ -114,6 +114,8 @@
     </div>
     <div class="fixTableHead" id="inspWr">
         <input type="checkbox" id="filterToggle" checked> enable filtering
+        <input type="checkbox" id="filterSubstrToggle"> enable substring filtering
+        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
         available clips:<div id="inspCtgContain"></div><div id="inspFltrContain"></div>
         <table id="inspector">
             <thead>
@@ -230,20 +232,25 @@
                             availClipCategories.push(newcatg);
                             clipCatToWrite += ("<button class=\"ctgbtn\" value=\"" + (currClipCategory + newcatg) + "\">" + newcatg + "</button>");
                         }
-                        let currClipBegi = "";
-                        if (availableClips.data[i].name.match('/') == -1) {
-                            currClipBegi = availableClips.data[i].name;
-                        } else {
-                            currClipBegi = availableClips.data[i].name.match(/\/(?:.(?!\/))+$/)[0];
-                        }
-                        currClipBegi = currClipBegi.slice(0,5);
-                        if (currClipBegi.match(prevClipBegi)) {
-                            if (availClipFilters.indexOf(currClipBegi) == -1) {
-                                availClipFilters.push(currClipBegi);
-                                clipFilterToWrite += ("<button class=\"fltrbtn\" value=\"" + (currClipBegi) + "\">" + currClipBegi + "</button>")
+                        if (document.getElementById("filterSubstrToggle").checked) {
+                            let currClipBegi = "";
+                            if (availableClips.data[i].name.match('/') == -1) {
+                                currClipBegi = availableClips.data[i].name;
+                            } else {
+                                currClipBegi = availableClips.data[i].name.match(/\/(?:.(?!\/))+$/)[0];
                             }
+                            currClipBegi = currClipBegi.slice(0,6);
+                            if (currClipBegi.match(prevClipBegi)) {
+                                if (availClipFilters.indexOf(currClipBegi) == -1) {
+                                    availClipFilters.push(currClipBegi);
+                                    clipFilterToWrite += ("<button class=\"fltrbtn\" value=\"" + (currClipBegi) + "\">" + currClipBegi + "</button>")
+                                }
+                            }
+                            prevClipBegi = currClipBegi;
+                        } else {
+                            // Very ineffective...
+                            clipFilterToWrite = "";
                         }
-                        prevClipBegi = currClipBegi;
                     }
                 } else {
                     // This is verry ineffective way of doing this, but simplest for now
@@ -291,6 +298,17 @@
 
     $("#filterToggle").click(function() {
         currClipCategory = "";
+        currClipFilter = "";
+        updateInspector();
+        if (this.checked == false) {
+            document.getElementById("filterSubstrToggle").checked = false;
+            document.getElementById("filterSubstrToggle").disabled = true;
+        } else {
+            document.getElementById("filterSubstrToggle").disabled = false;
+        }
+    });
+
+    $("#filterSubstrToggle").click(function() {
         currClipFilter = "";
         updateInspector();
     });
