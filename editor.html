@@ -11,7 +11,9 @@
         #acti-por div {
             display: inline-block;
         }
-        
+        #inspFltrContain button{
+            background-color: lightblue;
+        }
         .fixTableHead {
             overflow-y: auto;
             height: 800px;
@@ -111,7 +113,7 @@
         </table>
     </div>
     <div class="fixTableHead" id="inspWr">
-        available clips:<div id="inspCtgContain"></div>
+        available clips:<div id="inspCtgContain"></div><div id="inspFltrContain"></div>
         <table id="inspector">
             <thead>
                 <tr><th>name</th><th>duration</th></tr>
@@ -130,6 +132,8 @@
     var availableLogos;
     var availClipCategories = [];
     var currClipCategory = "";
+    var availClipFilters = [];
+    var currClipFilter = "";
 
     var myUrl = (window.location.protocol + "//" + window.location.hostname + ":" + window.location.port);
     
@@ -207,6 +211,9 @@
             var clipCatToWrite = "<button class=\"ctgbtn\" value=\"\">root</button><button class=\"ctgbtn\" value=\"" + wayBack + "\">back</button>";
             availClipCategories = [];
             availableLogos = [];
+            availClipFilters = [];
+            let prevClipBegi = "";
+            var clipFilterToWrite = "<button class=\"fltrbtn\" value=\"\">clear</button>";
             for (var i = 0; i < availableClips.data.length; i++) {
                 availableClips.data[i].name = (availableClips.data[i].name).replace("aaavyplne", "_0vyplne");
                 if ((availableClips.data[i].name).match("\^" + currClipCategory + "\.*" + "/")) {
@@ -218,13 +225,25 @@
                         }
                     }
                     if (newcatg != null){
-                        newcatg = newcatg;
                         availClipCategories.push(newcatg);
                         clipCatToWrite += ("<button class=\"ctgbtn\" value=\"" + (currClipCategory + newcatg) + "\">" + newcatg + "</button>");
                     }
+                    let currClipBegi = "";
+                    if (availableClips.data[i].name.match('/') == -1) {
+                        currClipBegi = availableClips.data[i].name;
+                    } else {
+                        currClipBegi = availableClips.data[i].name.match(/\/(?:.(?!\/))+$/)[0];
+                    }
+                    currClipBegi = currClipBegi.slice(0,5);
+                    if (currClipBegi.match(prevClipBegi)) {
+                        if (availClipFilters.indexOf(currClipBegi) == -1) {
+                            availClipFilters.push(currClipBegi);
+                            clipFilterToWrite += ("<button class=\"fltrbtn\" value=\"" + (currClipBegi) + "\">" + currClipBegi + "</button>")
+                        }
+                    }
+                    prevClipBegi = currClipBegi;
                 }
-                if ((availableClips.data[i].name).match("\^" + currClipCategory)) {
-                    console.log(i + ": " + availableClips.data[i].name + " : " + currClipCategory);
+                if ((availableClips.data[i].name).match("\^" + currClipCategory) && availableClips.data[i].name.match(currClipFilter)) {
                     clipToWriteToInsp += "<tr class=\"avClipTblItem";
                     if (inspItOdd == false) {
                         clipToWriteToInsp += " even";
@@ -239,6 +258,7 @@
             selectedAddItem = -1;
             document.getElementById("avaClipTabl").innerHTML = clipToWriteToInsp;
             document.getElementById("inspCtgContain").innerHTML = clipCatToWrite;
+            document.getElementById("inspFltrContain").innerHTML = clipFilterToWrite;
             updateStatus("ok", "");
             $(".avClipTblItem").click(function(){
                 conInsp = true;
@@ -250,6 +270,11 @@
             });
             $(".ctgbtn").click(function(){
                 currClipCategory = this.value;
+                updateInspector();
+            });
+            $(".fltrbtn").click(function() {
+                currClipFilter = this.value;
+                console.log(this.value);
                 updateInspector();
             });
         } else if (availableClips.status == "err") {
