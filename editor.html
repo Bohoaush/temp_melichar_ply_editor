@@ -113,6 +113,7 @@
         </table>
     </div>
     <div class="fixTableHead" id="inspWr">
+        <input type="checkbox" id="filterToggle" checked> enable filtering
         available clips:<div id="inspCtgContain"></div><div id="inspFltrContain"></div>
         <table id="inspector">
             <thead>
@@ -216,32 +217,38 @@
             var clipFilterToWrite = "<button class=\"fltrbtn\" value=\"\">clear</button>";
             for (var i = 0; i < availableClips.data.length; i++) {
                 availableClips.data[i].name = (availableClips.data[i].name).replace("aaavyplne", "_0vyplne");
-                if ((availableClips.data[i].name).match("\^" + currClipCategory + "\.*" + "/")) {
-                    let newcatg = (((availableClips.data[i].name.replace(currClipCategory, "")).split('/'))[0] + "/");
-                    for (clipcategory of availClipCategories) {
-                        if (newcatg == clipcategory) {
-                            newcatg = null;
-                            break;
+                if (document.getElementById("filterToggle").checked) {
+                    if ((availableClips.data[i].name).match("\^" + currClipCategory + "\.*" + "/")) {
+                        let newcatg = (((availableClips.data[i].name.replace(currClipCategory, "")).split('/'))[0] + "/");
+                        for (clipcategory of availClipCategories) {
+                            if (newcatg == clipcategory) {
+                                newcatg = null;
+                                break;
+                            }
                         }
-                    }
-                    if (newcatg != null){
-                        availClipCategories.push(newcatg);
-                        clipCatToWrite += ("<button class=\"ctgbtn\" value=\"" + (currClipCategory + newcatg) + "\">" + newcatg + "</button>");
-                    }
-                    let currClipBegi = "";
-                    if (availableClips.data[i].name.match('/') == -1) {
-                        currClipBegi = availableClips.data[i].name;
-                    } else {
-                        currClipBegi = availableClips.data[i].name.match(/\/(?:.(?!\/))+$/)[0];
-                    }
-                    currClipBegi = currClipBegi.slice(0,5);
-                    if (currClipBegi.match(prevClipBegi)) {
-                        if (availClipFilters.indexOf(currClipBegi) == -1) {
-                            availClipFilters.push(currClipBegi);
-                            clipFilterToWrite += ("<button class=\"fltrbtn\" value=\"" + (currClipBegi) + "\">" + currClipBegi + "</button>")
+                        if (newcatg != null){
+                            availClipCategories.push(newcatg);
+                            clipCatToWrite += ("<button class=\"ctgbtn\" value=\"" + (currClipCategory + newcatg) + "\">" + newcatg + "</button>");
                         }
+                        let currClipBegi = "";
+                        if (availableClips.data[i].name.match('/') == -1) {
+                            currClipBegi = availableClips.data[i].name;
+                        } else {
+                            currClipBegi = availableClips.data[i].name.match(/\/(?:.(?!\/))+$/)[0];
+                        }
+                        currClipBegi = currClipBegi.slice(0,5);
+                        if (currClipBegi.match(prevClipBegi)) {
+                            if (availClipFilters.indexOf(currClipBegi) == -1) {
+                                availClipFilters.push(currClipBegi);
+                                clipFilterToWrite += ("<button class=\"fltrbtn\" value=\"" + (currClipBegi) + "\">" + currClipBegi + "</button>")
+                            }
+                        }
+                        prevClipBegi = currClipBegi;
                     }
-                    prevClipBegi = currClipBegi;
+                } else {
+                    // This is verry ineffective way of doing this, but simplest for now
+                    clipCatToWrite = "";
+                    clipFilterToWrite = "";
                 }
                 if ((availableClips.data[i].name).match("\^" + currClipCategory) && availableClips.data[i].name.match(currClipFilter)) {
                     clipToWriteToInsp += "<tr class=\"avClipTblItem";
@@ -281,6 +288,12 @@
             updateStatus("err", "Unable to list available media! Is media-scanner running?");
         }
     }
+
+    $("#filterToggle").click(function() {
+        currClipCategory = "";
+        currClipFilter = "";
+        updateInspector();
+    });
     
     function drawPlaylist() {
         var plyToDraw = "";
