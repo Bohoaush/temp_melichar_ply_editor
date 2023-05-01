@@ -3,7 +3,7 @@ var fs = require("fs");
 
 var fileinfo = require("./fileinform.js");
 var filehandle = require("./filehandler.js");
-var filecopier = require("./filecopier/filecopier.js");
+var filecopier = require("./filecopier.js");
 
 var authenticatedTokens = [];
 
@@ -152,7 +152,7 @@ http.createServer(async function (req, res) {
                 break;
 
             case "/copylog":
-                fs.readFile("modules/filecopier/copylog.txt", 'utf-8', function(err, data) {
+                fs.readFile("data/copylog.txt", 'utf-8', function(err, data) {
                     if (err) {
                         res.writeHead(500);
                         res.end();
@@ -166,7 +166,7 @@ http.createServer(async function (req, res) {
                 break;
 
             case "/getWantfiles":
-                fs.readFile("modules/filecopier/wantfiles.list", function(err, data) {
+                fs.readFile("data/wantfiles.list", function(err, data) {
                     if (err) {
                         res.writeHead(500);
                         res.end();
@@ -185,7 +185,7 @@ http.createServer(async function (req, res) {
                     newWantfiles += data;
                 });
                 req.on('end', function() {
-                    fs.writeFile("modules/filecopier/wantfiles.list", newWantfiles, (err) => {
+                    fs.writeFile("data/wantfiles.list", newWantfiles, (err) => {
                         if (err) {
                             res.writeHead(500);
                             res.end();

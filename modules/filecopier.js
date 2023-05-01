@@ -1,7 +1,7 @@
 var fs = require("fs");
 var readline = require("readline");
 
-var filehandle = require("../filehandler.js");
+var filehandle = require("./filehandler.js");
 
 
 var wantFiles = [];
@@ -34,7 +34,7 @@ function readWanted() {
     return new Promise(resolve => {
         wantFiles = [];
         var readWantedFilesOneByOne = readline.createInterface({
-            input: fs.createReadStream("modules/filecopier/wantfiles.list"),
+            input: fs.createReadStream("data/wantfiles.list"),
             crlfDelay: Infinity
         });
 
@@ -59,7 +59,7 @@ function scanDir(dir) {
         fs.readdir(dir, {withFileTypes: true}, (err, filenames) => {
             if (err) {
                 console.log(err)
-                fs.appendFile("modules/filecopier/copylog.txt", err.toString() + "\n", (err) => {
+                fs.appendFile("data/copylog.txt", err.toString() + "\n", (err) => {
                     if (err) {
                         console.log(err);
                     }
@@ -80,10 +80,10 @@ function scanDir(dir) {
 
 function readCopiedInfo() {
     return new Promise((resolve, reject) => {
-        fs.readFile("modules/filecopier/copyfile.info", "utf-8", (err, data) => {
+        fs.readFile("data/copyfile.info", "utf-8", (err, data) => {
             if (err) {
                 console.log(err);
-                fs.appendFile("modules/filecopier/copylog.txt", err.toString() + "\n", (err) => {
+                fs.appendFile("data/copylog.txt", err.toString() + "\n", (err) => {
                     if (err) {
                         console.log(err);
                     }
@@ -106,10 +106,10 @@ function compareCopy() {
             if (!fs.existsSync(filehandle.settings.filecop_wrk + wafle)) {
                 if (fs.existsSync(filehandle.settings.filecop_mnt + wafle)) {
                     console.log("copying " + wafle);
-                    fs.appendFile("modules/filecopier/copylog.txt", "copying " + wafle + "\n", (err) => {
+                    fs.appendFile("data/copylog.txt", "copying " + wafle + "\n", (err) => {
                         if (err) {
                             console.log(err);
-                            fs.appendFile("modules/filecopier/copylog.txt", err.toString() + "\n", (err) => {
+                            fs.appendFile("data/copylog.txt", err.toString() + "\n", (err) => {
                                 if (err) {
                                     console.log(err);
                                 }
@@ -120,7 +120,7 @@ function compareCopy() {
                     if (!fs.existsSync(filehandle.settings.filecop_wrk + wafletracedir)) {
                         fs.mkdirSync((filehandle.settings.filecop_wrk + wafletracedir), {recursive: true});
                         console.log("created directory " + wafletracedir);
-                        fs.appendFile("modules/filecopier/copylog.txt", ("created directory " + wafletracedir) + "\n", (err) => {
+                        fs.appendFile("data/copylog.txt", ("created directory " + wafletracedir) + "\n", (err) => {
                             if (err) {
                                 console.log(err);
                             }
@@ -129,7 +129,7 @@ function compareCopy() {
                     fs.copyFile(filehandle.settings.filecop_mnt + wafle, filehandle.settings.filecop_wrk + wafle, (err) => {
                         if (err) {
                             console.log(err);
-                            fs.appendFile("modules/filecopier/copylog.txt", err.toString() + "\n", (err) => {
+                            fs.appendFile("data/copylog.txt", err.toString() + "\n", (err) => {
                                 if (err) {
                                     console.log(err);
                                 }
@@ -138,7 +138,7 @@ function compareCopy() {
                         } else {
                             copiedFiles.push(wafle);
                             console.log("copied " + wafle);
-                            fs.appendFile("modules/filecopier/copylog.txt", "copied " + wafle + "\n", (err) => {
+                            fs.appendFile("data/copylog.txt", "copied " + wafle + "\n", (err) => {
                                 if (err) {
                                     console.log(err);
                                 }
@@ -148,7 +148,7 @@ function compareCopy() {
                     });
                 } else {
                     console.log(wafle + " doesn't exist");
-                    fs.appendFile("modules/filecopier/copylog.txt", wafle + " doesn't exist\n", (err) => {
+                    fs.appendFile("data/copylog.txt", wafle + " doesn't exist\n", (err) => {
                         if (err) {
                             console.log(err);
                         }
@@ -160,7 +160,7 @@ function compareCopy() {
                 compareCopy();
             }
         } else {
-            fs.writeFile("modules/filecopier/copyfile.info", JSON.stringify(copiedFiles), (err) => {
+            fs.writeFile("data/copyfile.info", JSON.stringify(copiedFiles), (err) => {
                 if (err) {
                     console.log(err);
                     fs.appendFile("copylog.txt", err.toString() + "\n", (err) => {
@@ -172,7 +172,7 @@ function compareCopy() {
             });
             if (unavailFiles.length > 0) {
                 console.log(unavailFiles + " are not available");
-                fs.appendFile("modules/filecopier/copylog.txt", unavailFiles + " are not available\n", (err) => {
+                fs.appendFile("data/copylog.txt", unavailFiles + " are not available\n", (err) => {
                     if (err) {
                         console.log(err);
                     }
@@ -181,14 +181,14 @@ function compareCopy() {
             if (erroredFiles.length > 0) {
                 console.log("_________________________________");
                 console.log(erroredFiles + " had errors during copy!");
-                fs.appendFile("modules/filecopier/copylog.txt", "___________________________________\n" + erroredFiles + " had errors during copy\n", (err) => {
+                fs.appendFile("data/copylog.txt", "___________________________________\n" + erroredFiles + " had errors during copy\n", (err) => {
                     if (err) {
                         console.log(err);
                     }
                 });
             }
             console.log("_____________COPYING FINISHED_____________");
-            fs.appendFile("modules/filecopier/copylog.txt", "_____________COPYING FINISHED_____________\n", (err) => {
+            fs.appendFile("data/copylog.txt", "_____________COPYING FINISHED_____________\n", (err) => {
                 if (err) {
                     console.log(err);
                 }
@@ -216,10 +216,10 @@ function compareDelete() {
     }
     Promise.all(deletePromises).then(() => {
         copiedFiles = copiedFiles.filter(aplit => aplit !== null);
-        fs.writeFile("modules/filecopier/copyfile.info", JSON.stringify(copiedFiles), (err) => {
+        fs.writeFile("data/copyfile.info", JSON.stringify(copiedFiles), (err) => {
             if (err) {
                 console.log(err);
-                fs.appendFile("modules/filecopier/copylog.txt", err.toString(), (err) => {
+                fs.appendFile("data/copylog.txt", err.toString(), (err) => {
                     if (err) {
                         console.log(err);
                     }
@@ -232,28 +232,37 @@ function compareDelete() {
 
 function executeDelete(toDelete) {
     return new Promise(resolve => {
-        fs.promises.unlink(filehandle.settings.filecop_wrk + toDelete).then(() => {
-            console.log("deleted " + toDelete);
-            fs.appendFile("modules/filecopier/copylog.txt", "deleted " + toDelete + "\n", (err) => {
+        if (fs.lstatSync(filehandle.settings.filecop_wrk + toDelete).isFile()) {
+            fs.promises.unlink(filehandle.settings.filecop_wrk + toDelete).then(() => {
+                console.log("deleted " + toDelete);
+                fs.appendFile("data/copylog.txt", "deleted " + toDelete + "\n", (err) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+                for (cofldl of copiedFiles) {
+                    if (toDelete == cofldl) {
+                        copiedFiles[copiedFiles.indexOf(cofldl)] = null;
+                    }
+                }
+            }).catch((err) => {
+                console.log(err);
+                fs.appendFile("data/copylog.txt", err.toString(), (err) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+
+            }).finally(() => {;
+                resolve();
+            });
+        } else {
+            console.log("Not deleting " + toDelete + ". Not a regular file");
+            fs.appendFile("data/copylog.txt", "Not deleting " + toDelete + ". Not a regular file\n", (err) => {
                 if (err) {
                     console.log(err);
                 }
             });
-            for (cofldl of copiedFiles) {
-                if (toDelete == cofldl) {
-                    copiedFiles[copiedFiles.indexOf(cofldl)] = null;
-                }
-            }
-        }).catch((err) => {
-            console.log(err);
-            fs.appendFile("modules/filecopier/copylog.txt", err.toString(), (err) => {
-                if (err) {
-                    console.log(err);
-                }
-            });
-            
-        }).finally(() => {;
-            resolve();
-        });
+        }
     });
 }
