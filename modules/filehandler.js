@@ -89,7 +89,7 @@ function setSettings() {
             module.exports.settings = {
                 http_port: 8087,
                 http_pass: "1234567",
-                allow_editor: true,
+                edi_accs_lvl: "full", // full / read / none
                 redir_to_cop: true,
                 allow_copier: true,
                 redir_to_edi: true,

@@ -65,7 +65,7 @@ http.createServer(async function (req, res) {
         switch(req.url) {
 
             case "/save":
-                if (filehandle.settings.allow_editor) {
+                if (filehandle.settings.edi_accs_lvl == "full") {
                     var receivedData = "";
                     let saveRet = {};
                     req.on('data', function(data) {
@@ -84,9 +84,14 @@ http.createServer(async function (req, res) {
                     });
                 } else {
                     res.writeHead(403);
-                    res.write("Editor disabled");
+                    res.write("Editor write access disabled");
                     res.end();
                 }
+                break;
+
+            case "/checkeditoraccesslevel":
+                res.write(JSON.stringify(filehandle.settings.edi_accs_lvl));
+                res.end();
                 break;
 
             case "/clips":
@@ -243,7 +248,7 @@ http.createServer(async function (req, res) {
                 break;
 
             default:
-                if (filehandle.settings.allow_editor) {
+                if (filehandle.settings.edi_accs_lvl == "full" || filehandle.settings.edi_accs_lvl == "read") {
                     fs.readFile("editor.html", function(err, data) {
                         if (err) {
                             res.writeHead(500);

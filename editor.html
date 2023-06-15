@@ -10,7 +10,7 @@
             font-family: Calibri, Ubuntu;
         }
         input {
-            background-color: #0077FF;
+            background-color: #0055AA;
             color: #EEEEEE;
             transition-duration: 0.2s;
             border: none;
@@ -20,13 +20,13 @@
             font-weight: bold;
         }
         input:hover {
-            background-color: #0055AA;
+            background-color: #004499;
         }
         input:active {
             background-color: #111155;
         }
         select {
-            background-color: #0077FF;
+            background-color: #0055AA;
             color: #EEEEEE;
             border: none;
             padding: 5px;
@@ -34,11 +34,15 @@
             font-family: Calibri, Ubuntu;
             font-weight: bold;
         }
+        #rowarn {
+            font-weight: bold;
+            color: yellow;
+        }
         #acti-por div {
             display: inline-block;
         }
         #inspWr button{
-            background-color: #0077FF;
+            background-color: #0055AA;
             color: #EEEEEE;
             transition-duration: 0.2s;
             border: 1px solid white;
@@ -48,7 +52,7 @@
             font-weight: bold;
         }
         #inspWr button:hover {
-            background-color: #0055AA;
+            background-color: #004499;
         }
         #inspWr button:active {
             background-color: #111155;
@@ -124,6 +128,9 @@
     <input id="load" type="button" value="LOAD">
     &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
     <input type="checkbox" id="autoScroll"> enable auto scroll (use alt + up/down to scroll manually)
+    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+    <span id="rowarn"></span>
     <hr>
     <input id="insert" type="button" value="INSERT">
     <input id="add" type="button" value="ADD">
@@ -188,6 +195,16 @@
     
     var curLdPlyName;
     var unsavedChanges = false;
+
+    var accessLevel = JSON.parse(httpGet(myUrl + "/checkeditoraccesslevel"));
+
+    if (accessLevel == "read") {
+        let savebutton = document.getElementById("save");
+        savebutton.disabled = true;
+        savebutton.style.backgroundColor = "gray";
+        savebutton.title = "The editor is in read-only mode!"
+        document.getElementById("rowarn").innerHTML = "READ-ONLY MODE!"
+    }
 
     function confirmClose() {
         if (unsavedChanges) {
@@ -446,6 +463,9 @@
             }
             drawPlaylist();
             unsavedChanges = true;
+            if (accessLevel == "read") {
+                window.alert("The editor is in READ-ONLY MODE! \nYou will not be able to save the playlist.");
+            }
         } else {
             addSelToPly();
         }
@@ -471,31 +491,38 @@
         }
         drawPlaylist();
         unsavedChanges = true;
+        if (accessLevel == "read") {
+            window.alert("The editor is in READ-ONLY MODE! \nYou will not be able to save the playlist.");
+        }
     }
     
     $("#save").click(function() {
         savePly();
     });
-    
+    // TODO Inform user that saving is not possible if access level is read
     function savePly() {
-        let savefilename = window.prompt("Playlist name:", curLdPlyName || "playlist_yyyymmdd.ply");
-        if (savefilename != null && savefilename != "") {
-            if (!savefilename.match(/\.ply$/)) {
-                savefilename = savefilename + ".ply";
-            }
-            var sendPlyObj = {};
-            sendPlyObj.ply = uiLdPly;
-            sendPlyObj.name = savefilename;
-            let saveStatus = JSON.parse(httpPost(myUrl + "/save", JSON.stringify(sendPlyObj)));
-            curLdPlyName = savefilename;
-            if (saveStatus.status == "ok") {
-                updateStatus("ok", "Playlist saved successfully");
-                unsavedChanges = false;
+        if (accessLevel == "full") {
+            let savefilename = window.prompt("Playlist name:", curLdPlyName || "playlist_yyyymmdd.ply");
+            if (savefilename != null && savefilename != "") {
+                if (!savefilename.match(/\.ply$/)) {
+                    savefilename = savefilename + ".ply";
+                }
+                var sendPlyObj = {};
+                sendPlyObj.ply = uiLdPly;
+                sendPlyObj.name = savefilename;
+                let saveStatus = JSON.parse(httpPost(myUrl + "/save", JSON.stringify(sendPlyObj)));
+                curLdPlyName = savefilename;
+                if (saveStatus.status == "ok") {
+                    updateStatus("ok", "Playlist saved successfully");
+                    unsavedChanges = false;
+                } else {
+                    updateStatus("err", "Failed to save playlist!");
+                }
             } else {
-                updateStatus("err", "Failed to save playlist!");
+                window.alert("You need to specify the filename!");
             }
         } else {
-            window.alert("You need to specify the filename!");
+            window.alert("The editor is in READ-ONLY MODE! \nSaving is disabled.");
         }
     }
     
@@ -566,6 +593,9 @@
             }
             drawPlaylist();
             unsavedChanges = true;
+            if (accessLevel == "read") {
+                window.alert("The editor is in READ-ONLY MODE! \nYou will not be able to save the playlist.");
+            }
         } else {
             addDummyToPly();
         }
@@ -590,6 +620,9 @@
         uiLdPly.plyitems.push(itemToAdd);
         drawPlaylist();
         unsavedChanges = true;
+        if (accessLevel == "read") {
+            window.alert("The editor is in READ-ONLY MODE! \nYou will not be able to save the playlist.");
+        }
     }
     
     $("#remove").click(function() {
@@ -615,6 +648,9 @@
             }
             drawPlaylist();
             unsavedChanges = true;
+            if (accessLevel == "read") {
+                window.alert("The editor is in READ-ONLY MODE! \nYou will not be able to save the playlist.");
+            }
         } else {
             window.alert("No item selected for deletion");
         }
@@ -646,6 +682,9 @@
             }
             drawPlaylist();
             unsavedChanges = true;
+            if (accessLevel == "read") {
+                window.alert("The editor is in READ-ONLY MODE! \nYou will not be able to save the playlist.");
+            }
         }
     } //TODO finish
     
