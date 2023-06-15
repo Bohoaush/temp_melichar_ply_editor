@@ -90,7 +90,9 @@ function setSettings() {
                 http_port: 8087,
                 http_pass: "1234567",
                 allow_editor: true,
+                redir_to_cop: true,
                 allow_copier: true,
+                redir_to_edi: true,
                 filecop_mnt: "../../",
                 filecop_ori: "../",
                 filecop_wrk: "../"

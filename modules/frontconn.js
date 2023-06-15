@@ -144,6 +144,11 @@ http.createServer(async function (req, res) {
                         res.end();
                     }
                 });
+                } else if (filehandle.settings.redir_to_edi) {
+                    res.writeHead(307, {
+                        'Location':"/"
+                    });
+                    res.end();
                 } else {
                     res.writeHead(403);
                     res.write("File copier is disabled");
@@ -249,6 +254,11 @@ http.createServer(async function (req, res) {
                             res.end();
                         }
                     });
+                } else if (filehandle.settings.redir_to_cop) {
+                    res.writeHead(307, {
+                        'Location':"/copy"
+                    });
+                    res.end();
                 } else {
                     res.writeHead(403);
                     res.write("Editor is disabled");
