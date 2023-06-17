@@ -89,8 +89,11 @@ http.createServer(async function (req, res) {
                 }
                 break;
 
-            case "/checkeditoraccesslevel":
-                res.write(JSON.stringify(filehandle.settings.edi_accs_lvl));
+            case "/checkaccesslevels":
+                res.write(JSON.stringify({
+                    editor: filehandle.settings.edi_accs_lvl,
+                    copier: filehandle.settings.allow_copier
+                }));
                 res.end();
                 break;
 

@@ -196,14 +196,20 @@
     var curLdPlyName;
     var unsavedChanges = false;
 
-    var accessLevel = JSON.parse(httpGet(myUrl + "/checkeditoraccesslevel"));
+    var accessLevels = JSON.parse(httpGet(myUrl + "/checkaccesslevels"));
 
-    if (accessLevel == "read") {
+    if (accessLevels.editor == "read") {
         let savebutton = document.getElementById("save");
         savebutton.disabled = true;
         savebutton.style.backgroundColor = "gray";
-        savebutton.title = "The editor is in read-only mode!"
-        document.getElementById("rowarn").innerHTML = "READ-ONLY MODE!"
+        savebutton.title = "The editor is in read-only mode!";
+        document.getElementById("rowarn").innerHTML = "READ-ONLY MODE!";
+    }
+    if (accessLevels.copier != true) {
+        let gotocopbutton = document.getElementById("gotoFilecopier");
+        gotocopbutton.disabled = true;
+        gotocopbutton.style.backgroundColor = "gray";
+        gotocopbutton.title = "The file copier is disabled!";
     }
 
     function confirmClose() {
@@ -463,7 +469,7 @@
             }
             drawPlaylist();
             unsavedChanges = true;
-            if (accessLevel == "read") {
+            if (accessLevels.editor == "read") {
                 window.alert("The editor is in READ-ONLY MODE! \nYou will not be able to save the playlist.");
             }
         } else {
@@ -491,7 +497,7 @@
         }
         drawPlaylist();
         unsavedChanges = true;
-        if (accessLevel == "read") {
+        if (accessLevels.editor == "read") {
             window.alert("The editor is in READ-ONLY MODE! \nYou will not be able to save the playlist.");
         }
     }
@@ -501,7 +507,7 @@
     });
     // TODO Inform user that saving is not possible if access level is read
     function savePly() {
-        if (accessLevel == "full") {
+        if (accessLevels.editor == "full") {
             let savefilename = window.prompt("Playlist name:", curLdPlyName || "playlist_yyyymmdd.ply");
             if (savefilename != null && savefilename != "") {
                 if (!savefilename.match(/\.ply$/)) {
@@ -593,7 +599,7 @@
             }
             drawPlaylist();
             unsavedChanges = true;
-            if (accessLevel == "read") {
+            if (accessLevels.editor == "read") {
                 window.alert("The editor is in READ-ONLY MODE! \nYou will not be able to save the playlist.");
             }
         } else {
@@ -620,7 +626,7 @@
         uiLdPly.plyitems.push(itemToAdd);
         drawPlaylist();
         unsavedChanges = true;
-        if (accessLevel == "read") {
+        if (accessLevels.editor == "read") {
             window.alert("The editor is in READ-ONLY MODE! \nYou will not be able to save the playlist.");
         }
     }
@@ -648,7 +654,7 @@
             }
             drawPlaylist();
             unsavedChanges = true;
-            if (accessLevel == "read") {
+            if (accessLevels.editor == "read") {
                 window.alert("The editor is in READ-ONLY MODE! \nYou will not be able to save the playlist.");
             }
         } else {
@@ -682,7 +688,7 @@
             }
             drawPlaylist();
             unsavedChanges = true;
-            if (accessLevel == "read") {
+            if (accessLevels.editor == "read") {
                 window.alert("The editor is in READ-ONLY MODE! \nYou will not be able to save the playlist.");
             }
         }

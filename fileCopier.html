@@ -39,7 +39,7 @@
 <div id="status-view">
 </div>
 <div id="button-panel">
-    <a href=".."><input id="save" type="button" value="<<== Return to playlist editor <<=="></a>
+    <a href=".."><input id="rtrnToEdi" type="button" value="<<== Return to playlist editor <<=="></a>
     <input id="startCopy" type="button" value="COPY">
     <input id="startDelete" type="button" value="DELETE">
     <input id="signOut" type="button" value="Sign out">
@@ -59,6 +59,15 @@
 
 <script>
     var myUrl = (window.location.protocol + "//" + window.location.hostname + ":" + window.location.port);
+
+    var accessLevels = JSON.parse(httpGet(myUrl + "/checkaccesslevels"));
+
+    if (accessLevels.editor == "none") {
+        let toEdiBtn = document.getElementById("rtrnToEdi");
+        toEdiBtn.disabled = true;
+        toEdiBtn.style.background = "gray";
+        toEdiBtn.title = "The editor is disabled!";
+    }
 
     document.getElementById("wfe").value = httpGet(myUrl + "/getWantfiles");
 
