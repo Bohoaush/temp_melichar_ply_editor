@@ -112,6 +112,9 @@ function setSettings() {
                 redir_to_cop: true,
                 allow_copier: true,
                 redir_to_edi: true,
+                http_ifc_lbl: "Your label with any color",
+                htt_lbl_colr: "black",
+                htt_lbl_bgcl: "yellow",
                 filecop_mnt: "../../",
                 filecop_ori: "../",
                 filecop_wrk: "../"

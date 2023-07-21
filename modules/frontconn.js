@@ -97,6 +97,15 @@ http.createServer(async function (req, res) {
                 res.end();
                 break;
 
+            case "/getuserlabel":
+                res.write(JSON.stringify({
+                    label: filehandle.settings.http_ifc_lbl,
+                    color: filehandle.settings.htt_lbl_colr,
+                    bgcolor: filehandle.settings.htt_lbl_bgcl
+                }));
+                res.end();
+                break;
+
             case "/clips":
                 var retObj = {}
                 fileinfo.getMediaCls().then(retCls => {

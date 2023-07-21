@@ -34,9 +34,18 @@
             font-family: Calibri, Ubuntu;
             font-weight: bold;
         }
+        #topbar {
+            display: flex;
+        }
         #rowarn {
             font-weight: bold;
             color: yellow;
+        }
+        #userlabel {
+            flex-grow: 1;
+            text-align: center;
+            height: 100%;
+            background-color: white;
         }
         #acti-por div {
             display: inline-block;
@@ -129,14 +138,21 @@
 <div id="status-view">
 </div>
 <div id="button-panel">
-    <input id="save" type="button" value="SAVE">
-    <select id="ldfilename"></select>
-    <input id="load" type="button" value="LOAD">
-    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-    <input type="checkbox" id="autoScroll"> enable auto scroll (use alt + up/down to scroll manually)
-    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-    <span id="rowarn"></span>
+    <div id="topbar">
+        <input id="save" type="button" value="SAVE">
+        &nbsp
+        <select id="ldfilename"></select>
+        &nbsp
+        <input id="load" type="button" value="LOAD">
+        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+        <input type="checkbox" id="autoScroll"> enable auto scroll (use alt + up/down to scroll manually)
+        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+        <span id="rowarn"></span>
+        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+        <div id="userlabel"></div>
+    </div>
     <hr>
     <input id="insert" type="button" value="INSERT">
     <input id="add" type="button" value="ADD">
@@ -220,6 +236,12 @@
         gotocopbutton.style.backgroundColor = "gray";
         gotocopbutton.title = "The file copier is disabled!";
     }
+
+    var userlabelinfo = JSON.parse(httpGet(myUrl + "/getuserlabel"));
+    const userlabel = document.getElementById("userlabel");
+    userlabel.innerHTML = userlabelinfo.label;
+    userlabel.style.color = userlabelinfo.color;
+    userlabel.style.backgroundColor = userlabelinfo.bgcolor;
 
     function confirmClose() {
         if (unsavedChanges) {

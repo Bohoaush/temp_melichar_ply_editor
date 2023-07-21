@@ -8,6 +8,9 @@
             background-color: #121212;
             color: #CCCCCC;
         }
+        #button-panel {
+            display: flex;
+        }
         #signOut {
             float: right;
         }
@@ -17,6 +20,7 @@
             transition-duration: 0.2s;
             border: none;
             padding: 5px;
+            margin: 3px;
             border-radius: 4px;
             font-family: Calibri, Ubuntu;
             font-weight: bold;
@@ -33,6 +37,12 @@
             flex-direction: column-reverse;
             height: 180px;
         }
+        #userlabel {
+            flex-grow: 1;
+            text-align: center;
+            font-family: Calibri, Ubuntu;
+            padding-top: 6px;
+        }
     </style>
 </head>
 <body>
@@ -42,6 +52,7 @@
     <a href=".."><input id="rtrnToEdi" type="button" value="<<== Return to playlist editor <<=="></a>
     <input id="startCopy" type="button" value="COPY">
     <input id="startDelete" type="button" value="DELETE">
+    <div id="userlabel"></div>
     <input id="signOut" type="button" value="Sign out">
 </div>
 <hr>
@@ -129,6 +140,12 @@
     }
 
     setInterval(updateLog, 15000);
+
+    var userlabelinfo = JSON.parse(httpGet(myUrl + "/getuserlabel"));
+    const userlabel = document.getElementById("userlabel");
+    userlabel.innerHTML = userlabelinfo.label;
+    userlabel.style.color = userlabelinfo.color;
+    userlabel.style.backgroundColor = userlabelinfo.bgcolor;
     
     document.addEventListener('keydown', function(event) {
         if (event.keyCode == 83 && event.ctrlKey) {
