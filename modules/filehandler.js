@@ -11,17 +11,36 @@ function loadPlyFromFile(filename) {
                 reject(err);
             } else {
                 var plyItemsArr = [];
-                let plyitems = xmlparser.parse(data).playlist.clip;
-                if (!(Symbol.iterator in plyitems)) {
-                    plyitems = [plyitems];
-                }
-                for (let plyitem of plyitems) {
-                    var jsoitem = {}
-                    jsoitem.path = plyitem['#text'].replace("/mnt/Video/", "");
-                    jsoitem.duration = (plyitem['@_duration']/1000);
-                    jsoitem.logo = (plyitem['@_logo']);
-                    plyItemsArr.push(jsoitem);
-                    console.log(jsoitem);
+
+                let playlistLoadingSubproduct = data.toString();
+                playlistLoadingSubproduct = playlistLoadingSubproduct.split("<playlist>")[1];
+                playlistLoadingSubproduct = playlistLoadingSubproduct.split("</playlist>")[0];
+                playlistLoadingSubproduct = playlistLoadingSubproduct.split("<");
+                for (let i = 0; i < playlistLoadingSubproduct.length; i++) {
+                    console.log(playlistLoadingSubproduct);
+                    let openingtag = playlistLoadingSubproduct[i].match(/^.*? /);
+                    if (openingtag) {
+                        let jsonitem = {};
+
+                        jsonitem.type = openingtag[0];
+
+                        jsonitem.path = playlistLoadingSubproduct[i].replace(/.*>/, "");
+                        jsonitem.path = jsonitem.path.replace("/mnt/Video/", "");
+
+                        let durparam = playlistLoadingSubproduct[i].match(/duration=".*?"/);
+                        if (durparam) {
+                            durparam = durparam[0].replace("duration=\"", "");
+                            durparam = durparam.replace("\"", "");
+                            jsonitem.duration = (durparam / 1000);
+                        }
+
+                        let logoparam = playlistLoadingSubproduct[i].match(/logo=".*?"/);
+                        if (logoparam) {
+                            logoparam = logoparam[0].replace("logo=\"", "");
+                            jsonitem.logo = logoparam.replace("\"", "");
+                        }
+                        plyItemsArr.push(jsonitem);
+                    }
                 }
                 resolve(plyItemsArr);
             }
@@ -49,7 +68,7 @@ function writePlyToFile(playlistObj, filename) {
             if (plyitem.logo != undefined && plyitem.logo != "" && plyitem.logo != "default") {
                 logoxmins = "\" logo=\"" + plyitem.logo;
             }
-            exportXml += ("   <clip duration=\"" + parseInt(plyitem.duration*1000) + logoxmins + "\">/mnt/Video/" + plyitem.path + "</clip>\n");
+            exportXml += ("   <" + plyitem.type + " duration=\"" + parseInt(plyitem.duration*1000) + logoxmins + "\">/mnt/Video/" + plyitem.path + "</clip>\n");
         }
         exportXml += "</playlist>";
         fs.writeFile("/mnt/Video/playlisty/" + filename, exportXml, (err) => {
