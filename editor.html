@@ -104,6 +104,12 @@
         .selectedPlyIt.dummy {
             background-color: red;
         }
+        .live {
+            background-color: #BB6020;
+        }
+        .selectedPlyIt.live {
+            background-color: orange;
+        }
         #plyViWr {
             width: 60%;
         }
@@ -137,6 +143,9 @@
     &nbsp&nbsp&nbsp&nbsp
     <input id="ins-dummy" type="button" value="INSERT DUMMY">
     <input id="add-dummy" type="button" value="ADD DUMMY">
+    &nbsp&nbsp&nbsp&nbsp
+    <input id="ins-live" type="button" value="INSERT LIVE">
+    <input id="add-live" type="button" value="ADD LIVE">
     &nbsp&nbsp&nbsp&nbsp
     <input id="remove" type="button" value="DELETE">
     &nbsp&nbsp&nbsp&nbsp
@@ -401,10 +410,14 @@
             var plitDurDisp = plitDurHour + ":" + plitDurMinu + ":" + plitDurSeco;
             
             var dummyOrNot = " dummy";
-            for (nomInsp of availableClips.data) {
-                if (uiLdPly.plyitems[i].path == nomInsp.name) {
-                    dummyOrNot = "";
-                    break;
+            if (uiLdPly.plyitems[i].type == "stream") {
+                dummyOrNot = " live";
+            } else {
+                for (nomInsp of availableClips.data) {
+                    if (uiLdPly.plyitems[i].path == nomInsp.name) {
+                        dummyOrNot = "";
+                        break;
+                    }
                 }
             }
 
@@ -452,6 +465,7 @@
             var itemToAdd = {};
             itemToAdd.aclid = selectedAddItem.replace("acl", "");
             itemToAdd.id = selectedPlyItem;
+            itemToAdd.type = "clip";
             itemToAdd.path = availableClips.data[itemToAdd.aclid].name;
             itemToAdd.duration = availableClips.data[itemToAdd.aclid].duration;
             uiLdPly.plyitems.splice(selectedPlyItem, 0, itemToAdd);
@@ -485,6 +499,7 @@
         var itemToAdd = {};
         itemToAdd.aclid = selectedAddItem.replace("acl", "");
         itemToAdd.id = uiLdPly.plyitems.length;
+        itemToAdd.type = "clip";
         itemToAdd.path = availableClips.data[itemToAdd.aclid].name;
         itemToAdd.duration = availableClips.data[itemToAdd.aclid].duration;
         uiLdPly.plyitems.push(itemToAdd);
@@ -582,6 +597,7 @@
         if (selectedPlyItem != -1) {
             var itemToAdd = {};
             itemToAdd.id = selectedPlyItem;
+            itemToAdd.type = "clip";
             itemToAdd.path = "DUMMY_CLIP";
             itemToAdd.duration = dummydur;
             uiLdPly.plyitems.splice(selectedPlyItem, 0, itemToAdd);
@@ -615,8 +631,71 @@
         let dummydur = window.prompt("Dummy duration in seconds: ");
         var itemToAdd = {};
         itemToAdd.id = uiLdPly.plyitems.length;
+        itemToAdd.type = "clip";
         itemToAdd.path = "DUMMY_CLIP";
         itemToAdd.duration = dummydur;
+        if (itemToAdd.id > 0) {
+            itemToAdd.startTime = (uiLdPly.plyitems[itemToAdd.id-1].startTime + (uiLdPly.plyitems[itemToAdd.id-1].duration*1000));
+        } else {
+            itemToAdd.startTime = new Date(Date.now());
+            itemToAdd.startTime = itemToAdd.startTime.setHours(6, 0, 0);
+        }
+        uiLdPly.plyitems.push(itemToAdd);
+        drawPlaylist();
+        unsavedChanges = true;
+        if (accessLevels.editor == "read") {
+            window.alert("The editor is in READ-ONLY MODE! \nYou will not be able to save the playlist.");
+        }
+    }
+
+    $("#ins-live").click(function() {
+        insertLive();
+    });
+
+    function insertLive() {
+        let livepath = window.prompt("Live path (usualy DECKLINK 1", "DECKLINK 1");
+        let livedur = window.prompt("Live duration in seconds: ");
+        if (selectedPlyItem != -1) {
+            var itemToAdd = {};
+            itemToAdd.id = selectedPlyItem;
+            itemToAdd.type = "stream";
+            itemToAdd.path = livepath;
+            itemToAdd.duration = livedur;
+            uiLdPly.plyitems.splice(selectedPlyItem, 0, itemToAdd);
+            if (selectedPlyItem > 0) {
+                uiLdPly.plyitems[itemToAdd.id].id = itemToAdd.id;
+                uiLdPly.plyitems[itemToAdd.id].startTime = (uiLdPly.plyitems[itemToAdd.id-1].startTime + (uiLdPly.plyitems[itemToAdd.id-1].duration*1000));
+            } else {
+                uiLdPly.plyitems[itemToAdd.id].startTime = new Date(Date.now());
+                uiLdPly.plyitems[itemToAdd.id].startTime = uiLdPly.plyitems[itemToAdd.id].startTime.setHours(6, 0, 0);
+            }
+            for (let i = (itemToAdd.id - -1); i < uiLdPly.plyitems.length; i++) {
+                console.log("test");
+                uiLdPly.plyitems[i].id = i;
+                uiLdPly.plyitems[i].startTime = (uiLdPly.plyitems[i-1].startTime + (uiLdPly.plyitems[i-1].duration*1000));
+            }
+            drawPlaylist();
+            unsavedChanges = true;
+            if (accessLevels.editor == "read") {
+                window.alert("The editor is in READ-ONLY MODE! \nYou will not be able to save the playlist.");
+            }
+        } else {
+            addLiveToPly();
+        }
+    }
+
+    $("#add-live").click(function() {
+        addLiveToPly();
+    });
+
+    function addLiveToPly() {
+        let livepath = window.prompt("Live path (usualy DECKLINK 1", "DECKLINK 1");
+        let livedur = window.prompt("Live duration in seconds: ");
+        var itemToAdd = {};
+        itemToAdd.id = uiLdPly.plyitems.length;
+        itemToAdd.type = "stream";
+        itemToAdd.path = livepath;
+        itemToAdd.duration = livedur;
         if (itemToAdd.id > 0) {
             itemToAdd.startTime = (uiLdPly.plyitems[itemToAdd.id-1].startTime + (uiLdPly.plyitems[itemToAdd.id-1].duration*1000));
         } else {

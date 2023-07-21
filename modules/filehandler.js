@@ -22,7 +22,7 @@ function loadPlyFromFile(filename) {
                     if (openingtag) {
                         let jsonitem = {};
 
-                        jsonitem.type = openingtag[0];
+                        jsonitem.type = openingtag[0].replace(" ", "");
 
                         jsonitem.path = playlistLoadingSubproduct[i].replace(/.*>/, "");
                         jsonitem.path = jsonitem.path.replace("/mnt/Video/", "");
