@@ -68,7 +68,10 @@ function writePlyToFile(playlistObj, filename) {
             if (plyitem.logo != undefined && plyitem.logo != "" && plyitem.logo != "default") {
                 logoxmins = "\" logo=\"" + plyitem.logo;
             }
-            exportXml += ("   <" + plyitem.type + " duration=\"" + parseInt(plyitem.duration*1000) + logoxmins + "\">/mnt/Video/" + plyitem.path + "</clip>\n");
+            if (plyitem.type == "clip") {
+                plyitem.path = ("/mnt/Video/" + plyitem.path);
+            }
+            exportXml += ("   <" + plyitem.type + " duration=\"" + parseInt(plyitem.duration*1000) + logoxmins + "\">" + plyitem.path + "</" + plyitem.type + ">\n");
         }
         exportXml += "</playlist>";
         fs.writeFile("/mnt/Video/playlisty/" + filename, exportXml, (err) => {
