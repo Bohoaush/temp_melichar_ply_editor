@@ -180,7 +180,7 @@
         playlist
         <table id="ply-view">
             <thead>
-                <tr><th>start time</th><th>duration</th><th>path</th><th>logo</th></tr>
+                <tr><th>start time</th><th>duration</th><th>path</th><th>logo</th><th>logo 4:3</th><th>disable IS</th><th>loop</th></tr>
             </thead>
             <tbody id="plyitemstbl">
                 
@@ -447,8 +447,23 @@
             if (!((uiLdPly.plyitems[i].path).match("_0vyplne/"))) {
                 fillerOrNot = " notafiller";
             }
+
+            let logoshiftins = "";
+            if (uiLdPly.plyitems[i].logoshift) {
+                logoshiftins = "checked";
+            }
+
+            let disableistrins = "";
+            if (uiLdPly.plyitems[i].disableistr) {
+                disableistrins = "checked";
+            }
+
+            let loopins = "";
+            if (uiLdPly.plyitems[i].loop) {
+                loopins = "checked";
+            }
             
-            plyToDraw += (dummyOrNot + fillerOrNot + "\" id=\"" + i + "\"><td>" + startTimeString + "</td><td>" + plitDurDisp + "</td><td>" + uiLdPly.plyitems[i].path + "</td><td><select class=\"logosel\" id=\"logo" + i + "\"><option value=\"" + uiLdPly.plyitems[i].logo + "\">" + uiLdPly.plyitems[i].logo + "</option></select></td></tr>");
+            plyToDraw += (dummyOrNot + fillerOrNot + "\" id=\"" + i + "\"><td>" + startTimeString + "</td><td>" + plitDurDisp + "</td><td>" + uiLdPly.plyitems[i].path + "</td><td><select class=\"logosel\" id=\"logo" + i + "\"><option value=\"" + uiLdPly.plyitems[i].logo + "\">" + uiLdPly.plyitems[i].logo + "</option></select></td><td><input type=\"checkbox\" class=\"logo43shift\" id=\"lo43go" + i + "\" " +  logoshiftins + "></td><td><input type=\"checkbox\" class=\"disableistr\" id=\"disableistream" + i + "\" " + disableistrins + "></td><td><input type=\"checkbox\" class=\"loopchkbox\" id=\"loop" + i + "\" " + loopins +"></td></tr>");
         }
         document.getElementById("plyitemstbl").innerHTML = plyToDraw;
         if (selectedPlyItem != -1) {
@@ -474,6 +489,18 @@
                 uiLdPly.plyitems[idtochangelogo].logo = this.value;
                 console.log(this.value);
             });
+        });
+        $(".logo43shift").click(function() {
+            let idtoshiftlogo = this.id.replace("lo43go", "");
+            uiLdPly.plyitems[idtoshiftlogo].logoshift = this.checked;
+        });
+        $(".disableistr").click(function() {
+            let idtotoggleistr = this.id.replace("disableistream", "");
+            uiLdPly.plyitems[idtotoggleistr].disableistr = this.checked;
+        });
+        $(".loopchkbox").click(function() {
+            let idtotoggleloop = this.id.replace("loop", "");
+            uiLdPly.plyitems[idtotoggleloop].loop = this.checked;
         });
         
     }

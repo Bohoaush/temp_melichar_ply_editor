@@ -39,6 +39,24 @@ function loadPlyFromFile(filename) {
                             logoparam = logoparam[0].replace("logo=\"", "");
                             jsonitem.logo = logoparam.replace("\"", "");
                         }
+
+                        let logoshiftparam = playlistLoadingSubproduct[i].match(/logoOffset=".*?"/);
+                        if (logoshiftparam) {
+                            logoshiftparam = logoshiftparam[0].replace("logoOffset=\"", "");
+                            if (logoshiftparam == "4:3\"") {
+                                jsonitem.logoshift = true;
+                            }
+                        }
+
+                        let disableistr = playlistLoadingSubproduct[i].match(/notOnInternet=".*?"/);
+                        if (disableistr) {
+                            jsonitem.disableistr = true;
+                        }
+
+                        let loop = playlistLoadingSubproduct[i].match(/loop=".*?"/);
+                        if (loop) {
+                            jsonitem.loop = true;
+                        }
                         plyItemsArr.push(jsonitem);
                     }
                 }
@@ -64,14 +82,23 @@ function writePlyToFile(playlistObj, filename) {
     return new Promise((resolve, reject) => {
         var exportXml = "<?xml version=\"1.0\"?>\n<playlist>\n"
         for (let plyitem of playlistObj.plyitems) {
-            var logoxmins = "";
+            var optionsxmlinsert = "";
             if (plyitem.logo != undefined && plyitem.logo != "" && plyitem.logo != "default") {
-                logoxmins = "\" logo=\"" + plyitem.logo;
+                optionsxmlinsert = "\" logo=\"" + plyitem.logo;
+            }
+            if (plyitem.logoshift) {
+                optionsxmlinsert += "\" logoOffset=\"4:3";
+            }
+            if (plyitem.disableistr) {
+                optionsxmlinsert += "\" notOnInternet=\"";
+            }
+            if (plyitem.loop) {
+                optionsxmlinsert += "\" loop=\""
             }
             if (plyitem.type == "clip") {
                 plyitem.path = ("/mnt/Video/" + plyitem.path);
             }
-            exportXml += ("   <" + plyitem.type + " duration=\"" + parseInt(plyitem.duration*1000) + logoxmins + "\">" + plyitem.path + "</" + plyitem.type + ">\n");
+            exportXml += ("   <" + plyitem.type + " duration=\"" + parseInt(plyitem.duration*1000) + optionsxmlinsert + "\">" + plyitem.path + "</" + plyitem.type + ">\n");
         }
         exportXml += "</playlist>";
         fs.writeFile("/mnt/Video/playlisty/" + filename, exportXml, (err) => {
