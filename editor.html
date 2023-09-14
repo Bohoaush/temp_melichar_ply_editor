@@ -643,11 +643,12 @@
     
     function insertDummy() {
         let dummydur = window.prompt("Dummy duration in seconds: ");
+        let dummyname = window.prompt("Dummy clip name", "DUMMY_CLIP");
         if (selectedPlyItem != -1) {
             var itemToAdd = {};
             itemToAdd.id = selectedPlyItem;
             itemToAdd.type = "clip";
-            itemToAdd.path = "DUMMY_CLIP";
+            itemToAdd.path = dummyname;
             itemToAdd.duration = dummydur;
             uiLdPly.plyitems.splice(selectedPlyItem, 0, itemToAdd);
             if (selectedPlyItem > 0) {
@@ -678,10 +679,11 @@
     
     function addDummyToPly() {
         let dummydur = window.prompt("Dummy duration in seconds: ");
+        let dummyname = window.prompt("Dummy clip name", "DUMMY_CLIP");
         var itemToAdd = {};
         itemToAdd.id = uiLdPly.plyitems.length;
         itemToAdd.type = "clip";
-        itemToAdd.path = "DUMMY_CLIP";
+        itemToAdd.path = dummyname;
         itemToAdd.duration = dummydur;
         if (itemToAdd.id > 0) {
             itemToAdd.startTime = (uiLdPly.plyitems[itemToAdd.id-1].startTime + (uiLdPly.plyitems[itemToAdd.id-1].duration*1000));
@@ -702,7 +704,7 @@
     });
 
     function insertLive() {
-        let livepath = window.prompt("Live path (usualy DECKLINK 1", "DECKLINK 1");
+        let livepath = window.prompt("Live path (usualy DECKLINK 1)", "DECKLINK 1");
         let livedur = window.prompt("Live duration in seconds: ");
         if (selectedPlyItem != -1) {
             var itemToAdd = {};
@@ -738,7 +740,7 @@
     });
 
     function addLiveToPly() {
-        let livepath = window.prompt("Live path (usualy DECKLINK 1", "DECKLINK 1");
+        let livepath = window.prompt("Live path (usualy DECKLINK 1)", "DECKLINK 1");
         let livedur = window.prompt("Live duration in seconds: ");
         var itemToAdd = {};
         itemToAdd.id = uiLdPly.plyitems.length;
