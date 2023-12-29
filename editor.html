@@ -5,30 +5,35 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <style>
         body {
-            background-color: #121212;
+            /*background-color: #121212;*/
+            background-image: linear-gradient(to bottom right, #004488, #000011);
             color: #CCCCCC;
             font-family: Calibri, Ubuntu;
         }
         input {
-            background-color: #0055AA;
+            /*background-color: #003399;*/
+            background-color: rgba(233,233,233,0.1);
             color: #EEEEEE;
-            transition-duration: 0.2s;
-            border: none;
-            padding: 5px;
-            border-radius: 4px;
+            transition-duration: 0.4s;
+            border: 1px solid white;
+            padding: 11px;
+            border-radius: 16px;
             font-family: Calibri, Ubuntu;
-            font-weight: bold;
+            font-size: 100%;
+            /*font-weight: bold;*/
         }
         input:hover {
-            background-color: #004499;
+            /*background-color: #004499;*/
+            background-color: rgba(233,233,233,0.8);
+            color: rgba(0,33,99,.8);
         }
         input:active {
             background-color: #111155;
         }
         select {
-            background-color: #0055AA;
+            background-color: rgba(233,233,233,0.1);
             color: #EEEEEE;
-            border: none;
+            border: 1px solid white;
             padding: 5px;
             border-radius: 4px;
             font-family: Calibri, Ubuntu;
@@ -79,45 +84,55 @@
             top: 0;
         }
         table {
+            border-spacing: 0;
             border-collapse: collapse;
             width: 100%;
+            /*border-radius: 10px;
+            border: 1px solid rgba(233,233,233,0.3);*/
         }
         th,
         td {
             padding: 8px 15px;
-            border: 2px solid #555577;
         }
         th {
-            background: #111155;
+            /*background: #111155;*/
+            background-color: rgba(22,22,22,0.3);
+            backdrop-filter: blur(15px);
         }
-        .even {
+        td {
+            background-image: linear-gradient(to bottom, rgba(40,40,40,0.5), rgba(10,10,10,0.5));
+            border: 1px solid rgba(233,233,233,0.3);
+        }
+        /*.even {
             background-color: #222222;
-        }
+            background-image: linear-gradient(to bottom, rgba(44,88,100,0.5), rgba(0,20,55,0.5));
+        }*/
         .notafiller {
-            background-color: #222244;
+            /*background-color: #222244;*/
+            background-image: linear-gradient(to bottom, rgba(40,100,233,1), rgba(30,50,100,1));
         }
         .selectedAdd {
-            color: #000088;
-            background-color: #BBBB00;
+            /*color: #000088;*/
+            /*background-color: #BBBB00;*/
+            background-image: linear-gradient(to bottom, rgba(0,255,255,0.7), rgba(40,40,40,0.5), rgba(0,255,255,0.5));
         }
         .selectedPlyIt {
-            color: #000088;
-            background-color: #BBBB00;
+            background-image: linear-gradient(to bottom, rgba(0,255,255,0.7), rgba(40,40,40,0.5), rgba(0,255,255,0.5));
         }
         .selectedPlyIt.notafiller {
-            background-color: #00EEEE;
+            background-image: linear-gradient(to bottom, rgba(0,255,255,0.7), rgba(40,100,233,1), rgba(0,255,255,0.5));
         }
         .dummy {
-            background-color: #A6281C;
+            background-image: linear-gradient(to bottom, rgba(255,0,0,0.5), rgba(200,10,10,0.5));
         }
         .selectedPlyIt.dummy {
-            background-color: red;
+            background-image: linear-gradient(to bottom, rgba(200,255,255,0.7), rgba(255,0,0,.7), rgba(200,255,255,0.5));
         }
         .live {
-            background-color: #BB6020;
+            background-image: linear-gradient(to bottom, rgba(255,170,0,0.5), rgba(200,50,10,0.5));
         }
         .selectedPlyIt.live {
-            background-color: orange;
+            background-image: linear-gradient(to bottom, rgba(200,255,255,0.7), rgba(255,170,0,0.5), rgba(200,255,255,0.5));
         }
         #plyViWr {
             width: 60%;
@@ -177,7 +192,6 @@
 <hr>
 <div id="acti-por">
     <div class="fixTableHead" id="plyViWr">
-        playlist
         <table id="ply-view">
             <thead>
                 <tr><th>start time</th><th>duration</th><th>path</th><th>logo</th><th>logo 4:3</th><th>disable IS</th><th>loop</th></tr>
