@@ -34,6 +34,13 @@
             font-family: Calibri, Ubuntu;
             font-weight: bold;
         }
+        label {
+            border: none;
+            padding: 5px;
+            border-radius: 4px;
+            font-family: Calibri, Ubuntu;
+            font-weight: bold;
+        }
         #topbar {
             display: flex;
         }
@@ -119,6 +126,12 @@
         .selectedPlyIt.live {
             background-color: orange;
         }
+        .warning {
+            background-color: #8a196c;
+        }
+        .selectedPlyIt.warning {
+            background-color: #d1003b;
+        }
         #plyViWr {
             width: 60%;
         }
@@ -167,6 +180,8 @@
     &nbsp&nbsp&nbsp&nbsp
     <input id="mvUp" type="button" value="UP">
     <input id="mvDwn" type="button" value="DOWN">
+    &nbsp&nbsp&nbsp&nbsp
+    <label for="ldSemPly">LOAD PLY FROM SEM:</label><input id="ldSemPly" type="file" accept=".ply,.txt" onChange="loadSemPly()" title="experimental feature">
     &nbsp&nbsp&nbsp&nbsp
     <input id="updInsp" type="button" value="UPDATE AVAILABLE CLIPS">
     <div id="buttonsOnRight">
@@ -294,6 +309,70 @@
         statusView.innerHTML = (currentTime + msg);
     }
     
+    document.getElementById("ldSemPly").disabled = true;
+    function enableExperimental() {
+        document.getElementById("ldSemPly").disabled = false;
+    }
+    
+    function loadSemPly() {
+        let file = document.getElementById("ldSemPly").files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.readAsText(file, "UTF-8");
+            reader.onload = function (evt) {
+                let semPlyItemsByLine = evt.target.result.replace(/ /g, "");
+                semPlyItemsByLine = semPlyItemsByLine.replace(/X:\\/g,"");
+                semPlyItemsByLine = semPlyItemsByLine.replace(/\\/g,"\/");
+                semPlyItemsByLine = semPlyItemsByLine.split("\r\n");
+                for (let semLine of semPlyItemsByLine) {
+                    let itemToAdd = {};
+                    itemToAdd.id = uiLdPly.plyitems.length;
+                    itemToAdd.type = "clip";
+                    itemToAdd.path = semLine;
+                    uiLdPly.plyitems.push(itemToAdd);
+                    console.log("test0");
+                }
+                checkItmsPlyAgainstInsp(true);
+                drawPlaylist();
+            }
+            reader.onerror = function (evt) {
+                window.alert("unspecified error");
+            }
+        }
+
+    }
+    
+    function checkItmsPlyAgainstInsp(changedurs) {
+        // Checks items from playlist against inspector items while loading
+        let nextStartTime = new Date(Date.now());
+        nextStartTime.setHours(6, 0, 0);
+        console.log("test1");
+        if (availableClips) {
+            console.log("test2");
+            for (let plitem of uiLdPly.plyitems) {
+                console.log(plitem.path);
+                for (let avaClip of availableClips.data) {
+                    //console.log(avaClip.name);
+                    if (avaClip.name == plitem.path) {
+                        console.log("test5");
+                        if (plitem.duration != avaClip.duration) {
+                            console.log("test6");
+                            if (!changedurs) {
+                                plitem.warning = "duration mismatch";
+                            } else {
+                                console.log("test7");
+                                plitem.duration = avaClip.duration;
+                                plitem.startTime = nextStartTime;
+                                nextStartTime = nextStartTime - -(plitem.duration*1000);
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
     $("#updInsp").click(function() {
         updateInspector();
     });
@@ -315,7 +394,7 @@
             let prevClipBegi = "";
             var clipFilterToWrite = "<button class=\"fltrbtn\" value=\"\">clear</button>";
             for (var i = 0; i < availableClips.data.length; i++) {
-                availableClips.data[i].name = (availableClips.data[i].name).replace("aaavyplne", "_0vyplne");
+                //availableClips.data[i].name = (availableClips.data[i].name).replace("aaavyplne", "_0vyplne");
                 if (document.getElementById("filterToggle").checked) {
                     if ((availableClips.data[i].name).match("\^" + currClipCategory + "\.*" + "/")) {
                         let newcatg = (((availableClips.data[i].name.replace(currClipCategory, "")).split('/'))[0] + "/");
@@ -435,12 +514,19 @@
             if (uiLdPly.plyitems[i].type == "stream") {
                 dummyOrNot = " live";
             } else {
-                for (nomInsp of availableClips.data) {
-                    if (uiLdPly.plyitems[i].path == nomInsp.name) {
-                        dummyOrNot = "";
-                        break;
+                if (availableClips) {
+                    for (nomInsp of availableClips.data) {
+                        if (uiLdPly.plyitems[i].path == nomInsp.name) {
+                            dummyOrNot = "";
+                            break;
+                        }
                     }
                 }
+            }
+            
+            let warningOrNot = "";
+            if (uiLdPly.plyitems[i].warning == "duration mismatch") {
+                warningOrNot = " warning";
             }
 
             let fillerOrNot = "";
@@ -463,7 +549,7 @@
                 loopins = "checked";
             }
             
-            plyToDraw += (dummyOrNot + fillerOrNot + "\" id=\"" + i + "\"><td>" + startTimeString + "</td><td>" + plitDurDisp + "</td><td>" + uiLdPly.plyitems[i].path + "</td><td><select class=\"logosel\" id=\"logo" + i + "\"><option value=\"" + uiLdPly.plyitems[i].logo + "\">" + uiLdPly.plyitems[i].logo + "</option></select></td><td><input type=\"checkbox\" class=\"logo43shift\" id=\"lo43go" + i + "\" " +  logoshiftins + "></td><td><input type=\"checkbox\" class=\"disableistr\" id=\"disableistream" + i + "\" " + disableistrins + "></td><td><input type=\"checkbox\" class=\"loopchkbox\" id=\"loop" + i + "\" " + loopins +"></td></tr>");
+            plyToDraw += (dummyOrNot + warningOrNot + fillerOrNot + "\" id=\"" + i + "\"><td>" + startTimeString + "</td><td>" + plitDurDisp + "</td><td>" + uiLdPly.plyitems[i].path + "</td><td><select class=\"logosel\" id=\"logo" + i + "\"><option value=\"" + uiLdPly.plyitems[i].logo + "\">" + uiLdPly.plyitems[i].logo + "</option></select></td><td><input type=\"checkbox\" class=\"logo43shift\" id=\"lo43go" + i + "\" " +  logoshiftins + "></td><td><input type=\"checkbox\" class=\"disableistr\" id=\"disableistream" + i + "\" " + disableistrins + "></td><td><input type=\"checkbox\" class=\"loopchkbox\" id=\"loop" + i + "\" " + loopins +"></td></tr>");
         }
         document.getElementById("plyitemstbl").innerHTML = plyToDraw;
         if (selectedPlyItem != -1) {
@@ -628,6 +714,7 @@
                 if (selectedPlyItem >= uiLdPly.plyitems.length) {
                     selectedPlyItem = (uiLdPly.plyitems.length - 1);
                 }
+                checkItmsPlyAgainstInsp(false);
                 drawPlaylist();
                 curLdPlyName = plyToLoadList.value;
                 unsavedChanges = false;
