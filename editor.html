@@ -309,11 +309,6 @@
         statusView.innerHTML = (currentTime + msg);
     }
     
-    document.getElementById("ldSemPly").disabled = true;
-    function enableExperimental() {
-        document.getElementById("ldSemPly").disabled = false;
-    }
-    
     function loadSemPly() {
         let file = document.getElementById("ldSemPly").files[0];
         if (file) {
@@ -358,7 +353,9 @@
                         if (plitem.duration != avaClip.duration) {
                             console.log("test6");
                             if (!changedurs) {
-                                plitem.warning = "duration mismatch";
+                                if ((Math.trunc(avaClip.duration*1000))/1000 != plitem.duration) {
+                                    plitem.warning = "duration mismatch";
+                                } // ineffective but easy for now
                             } else {
                                 console.log("test7");
                                 plitem.duration = avaClip.duration;
@@ -368,6 +365,10 @@
                         }
                         break;
                     }
+                }
+                if (!plitem.startTime) {
+                    plitem.startTime = nextStartTime;
+                    plitem.duration = 0;
                 }
             }
         }
