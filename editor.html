@@ -564,6 +564,15 @@
             selectedPlyItem = this.id;
             document.getElementById(selectedPlyItem).classList.add("selectedPlyIt");
         });
+        $(".plyitem").dblclick(function(){
+            conInsp = false;
+            if (selectedPlyItem != -1) {
+                document.getElementById(selectedPlyItem).classList.remove("selectedPlyIt");
+            }
+            selectedPlyItem = this.id;
+            document.getElementById(selectedPlyItem).classList.add("selectedPlyIt");
+            changeItemProperties();
+        });
         $(".logosel").focus(function() {
             var choselogo = "<option class=\"logoopt\" value=\"default\">default</option>";
             for (avalogo of availableLogos) {
@@ -888,6 +897,39 @@
         }
     }
     
+    function changeItemProperties() {
+        if (selectedPlyItem > -1) {
+            let originalItem = uiLdPly.plyitems[selectedPlyItem];
+            /*let newItem = {};*/
+            let newdur = window.prompt("Dummy duration in seconds: ", originalItem.duration);
+            let newname = window.prompt("Dummy clip name", originalItem.path);
+            if (newdur && newname) {
+                /*deleteItemFromPly();*/
+                let itemToAdd = {};
+                itemToAdd.id = selectedPlyItem;
+                itemToAdd.type = "clip";
+                itemToAdd.path = newname;
+                itemToAdd.duration = newdur;
+                uiLdPly.plyitems.splice(selectedPlyItem, 0, itemToAdd);
+                if (selectedPlyItem > 0) {
+                    uiLdPly.plyitems[itemToAdd.id].id = itemToAdd.id;
+                    uiLdPly.plyitems[itemToAdd.id].startTime = (uiLdPly.plyitems[itemToAdd.id-1].startTime + (uiLdPly.plyitems[itemToAdd.id-1].duration*1000));
+                } else {
+                    uiLdPly.plyitems[itemToAdd.id].startTime = new Date(Date.now());
+                    uiLdPly.plyitems[itemToAdd.id].startTime = uiLdPly.plyitems[itemToAdd.id].startTime.setHours(6, 0, 0);
+                }
+                for (let i = (itemToAdd.id - -1); i < uiLdPly.plyitems.length; i++) {
+                    uiLdPly.plyitems[i].id = i;
+                    uiLdPly.plyitems[i].startTime = (uiLdPly.plyitems[i-1].startTime + (uiLdPly.plyitems[i-1].duration*1000));
+                }
+                selectedPlyItem = selectedPlyItem - -1;
+                deleteItemFromPly()
+                selectedPlyItem = selectedPlyItem - 1;
+                drawPlaylist();
+            }
+        }
+    }
+    
     $("#mvUp").click(function() {
         mvItem(-1);
     });
@@ -918,7 +960,7 @@
                 window.alert("The editor is in READ-ONLY MODE! \nYou will not be able to save the playlist.");
             }
         }
-    } //TODO finish
+    }
     
     var conInsp = false;
     
