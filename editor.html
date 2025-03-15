@@ -161,6 +161,11 @@
         <input type="checkbox" id="autoScroll"> enable auto scroll (use alt + up/down to scroll manually)
         &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
         &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+        <input id="exportNewMelPly" type="button" value="EXPORT M1 PLY" title="experimental feature">
+        <select id="ldjsonfilename"></select>
+        <input id="importNewMelPly" type="button" value="IMPORT M1 PLY" title="experimental feature">
+        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
         <span id="rowarn"></span>
         &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
         &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
@@ -181,7 +186,7 @@
     <input id="mvUp" type="button" value="UP">
     <input id="mvDwn" type="button" value="DOWN">
     &nbsp&nbsp&nbsp&nbsp
-    <label for="ldSemPly">LOAD PLY FROM SEM:</label><input id="ldSemPly" type="file" accept=".ply,.txt" onChange="loadSemPly()" title="experimental feature">
+    <label for="ldSemPly">LOAD PLY FROM SEM:</label><input id="ldSemPly" type="file" accept=".ply,.txt" onChange="loadSemPly()">
     &nbsp&nbsp&nbsp&nbsp
     <input id="updInsp" type="button" value="UPDATE AVAILABLE CLIPS">
     <div id="buttonsOnRight">
@@ -665,10 +670,17 @@
     $("#save").click(function() {
         savePly();
     });
-    // TODO Inform user that saving is not possible if access level is read
-    function savePly() {
+    $("#exportNewMelPly").click(function() {
+        savePly("json");
+    });
+    function savePly(mode) {
         if (accessLevels.editor == "full") {
-            let savefilename = window.prompt("Playlist name:", curLdPlyName || "playlist_yyyymmdd.ply");
+            let savefilename = "";
+            if (mode && mode == "json") {
+                savefilename = window.prompt("Playlist name:", "playlist-yyyy-mm-dd.ply");
+            } else {
+                savefilename = window.prompt("Playlist name:", curLdPlyName || "playlist_yyyymmdd.ply");
+            }
             if (savefilename != null && savefilename != "") {
                 if (!savefilename.match(/\.ply$/)) {
                     savefilename = savefilename + ".ply";
@@ -676,8 +688,13 @@
                 var sendPlyObj = {};
                 sendPlyObj.ply = uiLdPly;
                 sendPlyObj.name = savefilename;
-                let saveStatus = JSON.parse(httpPost(myUrl + "/save", JSON.stringify(sendPlyObj)));
-                curLdPlyName = savefilename;
+                let saveStatus = {};
+                if (mode && mode == "json") {
+                    saveStatus = JSON.parse(httpPost(myUrl + "/saveJson", JSON.stringify(sendPlyObj)));
+                } else {
+                    saveStatus = JSON.parse(httpPost(myUrl + "/save", JSON.stringify(sendPlyObj)));
+                    curLdPlyName = savefilename;
+                }
                 if (saveStatus.status == "ok") {
                     updateStatus("ok", "Playlist saved successfully");
                     unsavedChanges = false;
@@ -704,16 +721,37 @@
         document.getElementById("ldfilename").innerHTML = avaPlyList;
     });
     
+    $("#ldjsonfilename").focus(function() {
+        var avaPlys = JSON.parse(httpGet(myUrl + "/plysJson"));
+        setTimeout(function(){
+            console.log(avaPlys);
+        }, 2000);
+        var avaPlyList = "";
+        for (avaPly of avaPlys) {
+            avaPlyList += "<option value=\"" + avaPly + "\">" + avaPly + "</input>\n"
+        }
+        document.getElementById("ldjsonfilename").innerHTML = avaPlyList;
+    });
+    
     $("#load").click(function() {
         loadPly();
     });
     
-    function loadPly() {
+    $("#importNewMelPly").click(function() {
+        loadPly("ldjsonfilename");
+    });
+    
+    function loadPly(cfilenameitem) {
         if (confirmClose()) {
-            let plyToLoadList = document.getElementById("ldfilename");
+            let filenameitem = cfilenameitem || "ldfilename";
+            let plyToLoadList = document.getElementById(filenameitem);
             if (plyToLoadList.value != "" && plyToLoadList.value != null && plyToLoadList.value != undefined) {
                 console.log(plyToLoadList.value);
-                uiLdPly.plyitems = JSON.parse(httpPost((myUrl + "/open"), plyToLoadList.value));
+                if (cfilenameitem) {
+                    uiLdPly.plyitems = JSON.parse(httpPost((myUrl + "/openJson"), plyToLoadList.value));
+                } else {
+                    uiLdPly.plyitems = JSON.parse(httpPost((myUrl + "/open"), plyToLoadList.value));
+                }
                 uiLdPly.plyitems[0].id = 0;
                 uiLdPly.plyitems[0].startTime = new Date(Date.now());
                 uiLdPly.plyitems[0].startTime = uiLdPly.plyitems[0].startTime.setHours(6, 0, 0);

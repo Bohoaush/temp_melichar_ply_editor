@@ -88,6 +88,31 @@ http.createServer(async function (req, res) {
                     res.end();
                 }
                 break;
+                
+            case "/saveJson":
+                if (filehandle.settings.edi_accs_lvl == "full") {
+                    var receivedData = "";
+                    let saveRet = {};
+                    req.on('data', function(data) {
+                        receivedData += data;
+                    });
+                    req.on('end', function() {
+                        receivedData = JSON.parse(receivedData);
+                        filehandle.writePlyToJsonFile(receivedData.ply, (receivedData.name)).then(() => {
+                            saveRet.status = "ok";
+                        }).catch((err) => {
+                            saveRet.status = "err"
+                        }).finally(() => {
+                            res.write(JSON.stringify(saveRet));
+                            res.end();
+                        });
+                    });
+                } else {
+                    res.writeHead(403);
+                    res.write("Editor write access disabled");
+                    res.end();
+                }
+                break;
 
             case "/checkaccesslevels":
                 res.write(JSON.stringify({
@@ -132,6 +157,16 @@ http.createServer(async function (req, res) {
                     res.end();
                 });
                 break;
+                
+            case "/plysJson":
+                filehandle.listAvailablePlys("/mnt/Video/playlisty/forNewMelichar").then(filenames => {
+                    res.write(JSON.stringify(filenames));
+                    res.end();
+                }).catch(err => {
+                    console.log(err);
+                    res.end();
+                });
+                break;
 
             case "/open":
                 var opnPlyName = "";
@@ -140,6 +175,22 @@ http.createServer(async function (req, res) {
                 });
                 req.on('end', function() {
                     filehandle.loadPlyFromFile(opnPlyName).then(ply => {
+                        res.write(JSON.stringify(ply));
+                        res.end();
+                    }).catch(err => {
+                        console.log(err);
+                        res.end();
+                    });
+                });
+                break;
+                
+            case "/openJson":
+                var opnPlyName = "";
+                req.on('data', function(data) {
+                    opnPlyName += data;
+                });
+                req.on('end', function() {
+                    filehandle.loadPlyFromJsonFile(opnPlyName).then(ply => {
                         res.write(JSON.stringify(ply));
                         res.end();
                     }).catch(err => {

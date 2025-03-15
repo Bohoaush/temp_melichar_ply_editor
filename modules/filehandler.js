@@ -1,8 +1,4 @@
 var fs = require("fs");
-var fastxmlparser = require("fast-xml-parser");
-
-var xmlparser = new fastxmlparser.XMLParser({ignoreAttributes: false});
-var xmlbuilder = new fastxmlparser.XMLBuilder({ignoreAttributes: false});
 
 function loadPlyFromFile(filename) {
     return new Promise((resolve, reject) => {
@@ -66,9 +62,40 @@ function loadPlyFromFile(filename) {
     });
 }
 
-function listAvailablePlys() {
+function loadPlyFromJsonFile(filename) {
     return new Promise((resolve, reject) => {
-        fs.readdir("/mnt/Video/playlisty", (err, filenames) => {
+        fs. readFile("/mnt/Video/playlisty/forNewMelichar/" + filename, function(err, data) {
+            if (err) {
+                reject(err);
+            } else {
+                let plyToLoad = JSON.parse(data.toString());
+                let plyItemsArr = [];
+                for (let meliitemkey in plyToLoad.playlist) {
+                    let meliplyitem = plyToLoad.playlist[meliitemkey];
+                    let pledplyitem = {
+                        //type: set later,
+                        path: meliplyitem.file.path,
+                        duration: (meliplyitem.file.duration / 1000),
+                        //logo: not yet implemented,
+                        loop: meliplyitem.looped
+                    }
+                    if (meliplyitem.file.type == "video") {
+                        pledplyitem.type = "clip";
+                    } else if (meliplyitem.file.type == "stream") {
+                        pledplyitem.type = "stream";
+                    }
+                    plyItemsArr.push(pledplyitem);
+                }
+                resolve(plyItemsArr);
+            }
+        });
+    });
+}
+
+function listAvailablePlys(cdir) {
+    return new Promise((resolve, reject) => {
+        let dir = cdir || "/mnt/Video/playlisty";
+        fs.readdir(dir, (err, filenames) => {
             if (err) {
                 reject(err);
             } else {
@@ -102,6 +129,54 @@ function writePlyToFile(playlistObj, filename) {
         }
         exportXml += "</playlist>";
         fs.writeFile("/mnt/Video/playlisty/" + filename, exportXml, (err) => {
+            if (err) {
+                console.log(err);
+                reject(err);
+            } else {
+                resolve();
+            }
+        });
+    });
+}
+
+function writePlyToJsonFile(playlistObj, filename) {
+    return new Promise((resolve, reject) => {
+        let exportObj = {playlist:{}};
+        for (let plyitem of playlistObj.plyitems) {
+            let exp_plyitem = {file: {}};
+            exp_plyitem.file.name = plyitem.path.replace(/.*\//,"");
+            if (plyitem.type == "clip") {
+                exp_plyitem.file.type = "video";
+                exp_plyitem.file.segment = "video";
+            } else if (plyitem.type == "stream") {
+                exp_plyitem.file.type = "stream";
+            }
+            exp_plyitem.file.exists = true;
+            exp_plyitem.file.path = plyitem.path;
+            // not setting exp_plyitem.format
+            exp_plyitem.file.duration = parseInt(plyitem.duration*1000);
+            // not setting aspect ratio
+            // exp_plyitem.startTime = 0; // figure this out later if necessary...
+            exp_plyitem.expectedDuration = parseInt(plyitem.duration*1000);
+            exp_plyitem.fixed = false;
+            if (!plyitem.loop) {
+                exp_plyitem.looped = false;
+            } else {
+                exp_plyitem.looped = true;
+            }
+            exp_plyitem.played = false;
+            exp_plyitem.loaded = false;
+            if (plyitem.logo == undefined || plyitem.logo == "" || plyitem.logo == "default") {
+                exp_plyitem.logo = {};
+            } else {
+                // TODO
+            }
+            exportObj.playlist[plyitem.id - -1] = exp_plyitem;
+        }
+        exportObj.date = filename.replace("playlist-", "");
+        exportObj.date = exportObj.date.replace(".ply", "");
+        let exportJson = JSON.stringify(exportObj);
+        fs.writeFile("/mnt/Video/playlisty/forNewMelichar/" + filename, exportJson, (err) => {
             if (err) {
                 console.log(err);
                 reject(err);
@@ -167,6 +242,8 @@ function setSettings() {
 
 module.exports = {
     writePlyToFile,
+    writePlyToJsonFile,
     listAvailablePlys,
-    loadPlyFromFile
+    loadPlyFromFile,
+    loadPlyFromJsonFile
 }
