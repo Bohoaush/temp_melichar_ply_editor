@@ -762,6 +762,19 @@
                 if (selectedPlyItem >= uiLdPly.plyitems.length) {
                     selectedPlyItem = (uiLdPly.plyitems.length - 1);
                 }
+                if (cfilenameitem) {
+                    for (let plyitem of uiLdPly.plyitems) {
+                        for (let avaitem of availableClips.data) {
+                            let modpath = avaitem.name;
+                            modpath = modpath.toUpperCase();
+                            modpath = modpath.replace(/\..*$/, "");
+                            if (modpath == plyitem.path) {
+                                plyitem.path = avaitem.name;
+                                break;
+                            }
+                        }
+                    }
+                }
                 checkItmsPlyAgainstInsp(false);
                 drawPlaylist();
                 curLdPlyName = plyToLoadList.value;
