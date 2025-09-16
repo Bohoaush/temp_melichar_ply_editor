@@ -4,139 +4,208 @@
     <title>temp melichar ply editor</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <style>
+        :root {
+            --bg: #0e0f12;
+            --bg-elev: #16181d;
+            --panel: #1b1f27;
+            --text: #e6e6e6;
+            --muted: #9aa4ad;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --primary-active: #1d4ed8;
+            --border: #2a2f38;
+            --accent: #22c55e;
+            --warn: #f59e0b;
+            --error: #ef4444;
+            --table-row: #14171c;
+            --table-row-alt: #101318;
+            --shadow: 0 6px 24px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.35);
+            --radius: 10px;
+            --type-dummy: #ef4444;
+            --type-live: #f59e0b;
+            --type-warning: #f97316;
+            --type-notafiller: #22d3ee;
+            --hover-default: #1a2431;
+            --hover-notafiller: #192436;
+            --hover-dummy: #8a2323;
+            --hover-live: #9d4a0f;
+            --hover-warning: #874015;
+        }
         body {
-            background-color: #121212;
-            color: #CCCCCC;
+            background-color: var(--bg);
+            color: var(--text);
             font-family: Calibri, Ubuntu;
+            line-height: 1.45;
+            margin: 0;
         }
-        input {
-            background-color: #0055AA;
-            color: #EEEEEE;
-            transition-duration: 0.2s;
-            border: none;
-            padding: 5px;
-            border-radius: 4px;
+        input[type="button"], button {
+            background-color: var(--primary);
+            color: var(--text);
+            transition: background-color 0.2s ease, transform 0.05s ease, box-shadow 0.2s ease;
+            border: 1px solid transparent;
+            padding: 8px 12px;
+            border-radius: 8px;
             font-family: Calibri, Ubuntu;
-            font-weight: bold;
+            font-weight: 600;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 4px 12px rgba(59,130,246,0.15);
         }
-        input:hover {
-            background-color: #004499;
+        input[type="button"]:hover, button:hover {
+            background-color: var(--primary-hover);
         }
-        input:active {
-            background-color: #111155;
+        input[type="button"]:active, button:active {
+            background-color: var(--primary-active);
+            transform: translateY(1px);
+            box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 2px 8px rgba(29,78,216,0.18);
         }
-        select {
-            background-color: #0055AA;
-            color: #EEEEEE;
-            border: none;
-            padding: 5px;
-            border-radius: 4px;
+        select, input[type="file"], input[type="text"], input[type="search"] {
+            background-color: var(--panel);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 8px;
             font-family: Calibri, Ubuntu;
-            font-weight: bold;
+            font-weight: 600;
+        }
+        input[type="checkbox"] {
+            accent-color: var(--primary);
         }
         label {
             border: none;
-            padding: 5px;
+            padding: 5px 0;
             border-radius: 4px;
             font-family: Calibri, Ubuntu;
             font-weight: bold;
+            color: var(--muted);
         }
         #topbar {
             display: flex;
+            gap: 10px;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: linear-gradient(180deg, rgba(27,31,39,0.92), rgba(27,31,39,0.86));
+            backdrop-filter: saturate(140%) blur(6px);
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow);
         }
         #rowarn {
             font-weight: bold;
-            color: yellow;
+            color: var(--warn);
         }
         #userlabel {
             flex-grow: 1;
             text-align: center;
             height: 100%;
-            background-color: white;
+            background-color: var(--bg-elev);
+            color: var(--text);
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
         }
         #acti-por div {
             display: inline-block;
         }
         #inspWr button{
-            background-color: #0055AA;
-            color: #EEEEEE;
-            transition-duration: 0.2s;
-            border: 1px solid white;
-            padding: 5px;
-            border-radius: 4px;
+            background-color: var(--panel);
+            color: var(--text);
+            transition: background-color 0.2s ease;
+            border: 1px solid var(--border);
+            padding: 6px 10px;
+            border-radius: 8px;
             font-family: Calibri, Ubuntu;
-            font-weight: bold;
+            font-weight: 600;
         }
         #inspWr button:hover {
-            background-color: #004499;
+            background-color: #232936;
         }
         #inspWr button:active {
-            background-color: #111155;
+            background-color: #1b2230;
         }
         #inspFltrContain button {
-            background-color: lightblue;
-            color: black;
+            background-color: #243447;
+            color: var(--text);
+            border: 1px solid var(--border);
         }
         .fixTableHead {
             overflow-y: auto;
-            height: 800px;
+            height: calc(100vh - 240px);
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
         }
         .fixTableHead thead th {
             position: sticky;
             top: 0;
+            z-index: 1;
         }
         table {
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             width: 100%;
+            background: transparent;
         }
         th,
         td {
-            padding: 8px 15px;
-            border: 2px solid #555577;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            border-right: none;
+            border-left: none;
         }
         th {
-            background: #111155;
+            background: #0f141b;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-size: 12px;
+            border-bottom: 1px solid var(--border);
         }
         .even {
-            background-color: #222222;
+            background-color: var(--table-row);
         }
         .notafiller {
-            background-color: #222244;
+            background-color: #15202b;
         }
         .selectedAdd {
-            color: #000088;
-            background-color: #BBBB00;
+            color: #0b1220;
+            background-color: #93c5fd;
         }
         .selectedPlyIt {
-            color: #000088;
-            background-color: #BBBB00;
+            color: #0b1220;
+            background-color: #93c5fd;
         }
         .selectedPlyIt.notafiller {
-            background-color: #00EEEE;
+            background-color: #67e8f9;
         }
         .dummy {
-            background-color: #A6281C;
+            background-color: #7f1d1d;
         }
         .selectedPlyIt.dummy {
-            background-color: red;
+            background-color: #ef4444;
         }
         .live {
-            background-color: #BB6020;
+            background-color: #92400e;
         }
         .selectedPlyIt.live {
-            background-color: orange;
+            background-color: #f59e0b;
         }
         .warning {
-            background-color: #8a196c;
+            background-color: #7c2d12;
         }
         .selectedPlyIt.warning {
-            background-color: #d1003b;
+            background-color: #f97316;
         }
         #plyViWr {
             width: 60%;
+            vertical-align: top;
+            padding: 8px;
         }
         #inspWr {
             width: 35%;
+            vertical-align: top;
+            padding: 8px;
         }
         #inspWr table tbody td {
             word-wrap: break-word;
@@ -144,6 +213,79 @@
         }
         #buttonsOnRight {
             float: right;
+        }
+        #status-view {
+            margin: 10px 12px 0 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-elev);
+        }
+        #status-view:empty { display: none; }
+
+        /* Row hover */
+        #ply-view tbody tr,
+        #inspector tbody tr { cursor: pointer; }
+        #ply-view tbody tr:hover,
+        #inspector tbody tr:hover { background-color: var(--hover-default); }
+
+        /* Preserve selection and type colors on hover */
+        #ply-view tbody tr.selectedPlyIt:hover { background-color: #93c5fd; color: #0b1220; }
+        #inspector tbody tr.selectedAdd:hover { background-color: #93c5fd; color: #0b1220; }
+
+        /* Preserve type cues on hover */
+        #ply-view tbody tr.dummy:hover { background-color: var(--hover-dummy); }
+        #ply-view tbody tr.live:hover { background-color: var(--hover-live); }
+        #ply-view tbody tr.warning:hover { background-color: var(--hover-warning); }
+        #ply-view tbody tr.notafiller:not(.dummy):not(.live):not(.warning):not(.selectedPlyIt):hover { background-color: var(--hover-notafiller); }
+
+        /* Combined: ensure selected + type variants keep their special states */
+        #ply-view tbody tr.selectedPlyIt.notafiller { color: #0b1220; }
+        #ply-view tbody tr.selectedPlyIt.notafiller:hover { background-color: #67e8f9; color: #0b1220; }
+        #ply-view tbody tr.selectedPlyIt.dummy:hover { background-color: #ef4444; }
+        #ply-view tbody tr.selectedPlyIt.live:hover { background-color: #f59e0b; }
+        #ply-view tbody tr.selectedPlyIt.warning:hover { background-color: #f97316; }
+
+        /* Persistent type markers via left accent bar (works across hover/selection) */
+        #ply-view tbody tr.dummy { box-shadow: inset 4px 0 0 var(--type-dummy); }
+        #ply-view tbody tr.live { box-shadow: inset 4px 0 0 var(--type-live); }
+        #ply-view tbody tr.warning { box-shadow: inset 4px 0 0 var(--type-warning); }
+        #ply-view tbody tr.dummy.selectedPlyIt,
+        #ply-view tbody tr.dummy:hover { box-shadow: inset 4px 0 0 var(--type-dummy); }
+        #ply-view tbody tr.live.selectedPlyIt,
+        #ply-view tbody tr.live:hover { box-shadow: inset 4px 0 0 var(--type-live); }
+        #ply-view tbody tr.warning.selectedPlyIt,
+        #ply-view tbody tr.warning:hover { box-shadow: inset 4px 0 0 var(--type-warning); }
+
+        /* Not-a-filler persistent right accent stripe (non-conflicting with left type bar) */
+        #ply-view tbody tr.notafiller {
+            background-image: linear-gradient(to left, var(--type-notafiller), var(--type-notafiller));
+            background-size: 4px 100%;
+            background-position: right top;
+            background-repeat: no-repeat;
+        }
+        #ply-view tbody tr.notafiller:hover,
+        #ply-view tbody tr.notafiller.selectedPlyIt { /* keep stripe on hover/selection */
+            background-image: linear-gradient(to left, var(--type-notafiller), var(--type-notafiller));
+        }
+
+        /* Nice scrollbars */
+        .fixTableHead::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        .fixTableHead::-webkit-scrollbar-thumb {
+            background: #2b3340;
+            border-radius: 8px;
+            border: 2px solid #1a202b;
+        }
+        .fixTableHead::-webkit-scrollbar-track {
+            background: #11161d;
+            border-radius: 8px;
+        }
+        .fixTableHead {
+            scrollbar-color: #2b3340 #11161d;
+            scrollbar-width: thin;
         }
     </style>
 </head>
