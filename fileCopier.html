@@ -2,67 +2,237 @@
 <html>
 <head>
     <title>temp melichar ply editor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <style>
+        :root {
+            --bg: #0e0f12;
+            --bg-elev: #16181d;
+            --panel: #1b1f27;
+            --text: #e6e6e6;
+            --muted: #9aa4ad;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --primary-active: #1d4ed8;
+            --border: #2a2f38;
+            --shadow: 0 6px 24px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.35);
+            --radius: 10px;
+        }
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+        }
         body {
-            background-color: #121212;
-            color: #CCCCCC;
-        }
-        #button-panel {
-            display: flex;
-        }
-        #signOut {
-            float: right;
-        }
-        input {
-            background-color: #0055AA;
-            color: #EEEEEE;
-            transition-duration: 0.2s;
-            border: none;
-            padding: 5px;
-            margin: 3px;
-            border-radius: 4px;
+            background-color: var(--bg);
+            color: var(--text);
             font-family: Calibri, Ubuntu;
-            font-weight: bold;
+            font-size: clamp(13px, 0.35vw + 9px, 16px);
+            line-height: 1.45;
+            margin: 0;
         }
-        input:hover {
-            background-color: #004499;
+        input[type="button"], button {
+            background-color: var(--primary);
+            color: var(--text);
+            transition: background-color 0.2s ease, transform 0.05s ease, box-shadow 0.2s ease;
+            border: 1px solid transparent;
+            padding: 0.3em 0.7em;
+            font-size: 0.85em;
+            line-height: 1.3;
+            white-space: nowrap;
+            border-radius: 6px;
+            font-family: Calibri, Ubuntu;
+            font-weight: 600;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 2px 6px rgba(59,130,246,0.12);
         }
-        input:active {
-            background-color: #111155;
+        input[type="button"]:hover, button:hover {
+            background-color: var(--primary-hover);
         }
-        #logView {
-            overflow: scroll;
+        input[type="button"]:active, button:active {
+            background-color: var(--primary-active);
+            transform: translateY(1px);
+            box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 1px 4px rgba(29,78,216,0.18);
+        }
+        input[type="text"], input[type="password"], textarea {
+            background-color: var(--panel);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 0.3em 0.5em;
+            border-radius: 6px;
+            font-family: Calibri, Ubuntu;
+            font-size: 0.85em;
+            line-height: 1.3;
+            max-width: 100%;
+        }
+        input:focus, textarea:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: -1px;
+        }
+        body {
+            /* Fill the viewport: toolbar takes what it needs, panels get the rest */
             display: flex;
-            flex-direction: column-reverse;
-            height: 180px;
+            flex-direction: column;
+            min-height: 0;
+        }
+        #status-view {
+            flex: 0 0 auto;
+            margin: 10px 12px 0 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-elev);
+        }
+        #status-view:empty { display: none; }
+        #button-panel {
+            flex: 0 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            align-items: center;
+            padding: 10px 12px;
+            position: relative;
+            z-index: 10;
+            background: linear-gradient(180deg, rgba(27,31,39,0.92), rgba(27,31,39,0.86));
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+        .tb-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            align-items: center;
+            min-width: 0;
         }
         #userlabel {
-            flex-grow: 1;
+            flex: 1 1 12em;
             text-align: center;
-            font-family: Calibri, Ubuntu;
-            padding-top: 6px;
+            background-color: var(--bg-elev);
+            color: var(--text);
+            padding: 0.25em 0.75em;
+            font-size: 0.9em;
+            font-weight: 600;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+        #acti-por {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+        }
+        .panel {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 0;
+            min-width: 0;
+            padding: 8px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+        .panel-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            font-weight: bold;
+            color: var(--muted);
+            padding: 0 2px;
+        }
+        #wantfiles {
+            flex: 3 1 0;
+        }
+        #wfe {
+            flex: 1 1 auto;
+            min-height: 0;
+            width: 100%;
+            resize: none;
+            font-family: Consolas, "Ubuntu Mono", monospace;
+            white-space: pre;
+            background-color: var(--bg-elev);
+        }
+        #logPanel {
+            flex: 2 1 0;
+        }
+        #logView {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: auto;
+            display: flex;
+            flex-direction: column-reverse;
+            padding: 6px 8px;
+            font-family: Consolas, "Ubuntu Mono", monospace;
+            font-size: 0.85em;
+            overflow-wrap: anywhere;
+            background-color: var(--bg-elev);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+
+        /* Medium screens: tighter spacing */
+        @media (max-width: 1400px), (max-height: 800px) {
+            #button-panel { padding: 6px 10px; gap: 6px 12px; }
+            #acti-por { padding: 8px; gap: 8px; }
+        }
+        /* Narrow screens / portrait: stack the panels and let the page scroll */
+        @media (max-width: 1000px) {
+            body { height: auto; display: block; }
+            #acti-por { flex-direction: column; }
+            #wantfiles, #logPanel { flex: none; height: 70vh; }
+        }
+
+        /* Nice scrollbars */
+        #wfe::-webkit-scrollbar, #logView::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        #wfe::-webkit-scrollbar-thumb, #logView::-webkit-scrollbar-thumb {
+            background: #2b3340;
+            border-radius: 8px;
+            border: 2px solid #1a202b;
+        }
+        #wfe::-webkit-scrollbar-track, #logView::-webkit-scrollbar-track {
+            background: #11161d;
+            border-radius: 8px;
+        }
+        #wfe, #logView {
+            scrollbar-color: #2b3340 #11161d;
+            scrollbar-width: thin;
         }
     </style>
 </head>
 <body>
-<div id="status-view">
-</div>
+<div id="status-view"></div>
 <div id="button-panel">
-    <a href=".."><input id="rtrnToEdi" type="button" value="<<== Return to playlist editor <<=="></a>
-    <input id="startCopy" type="button" value="COPY">
-    <input id="startDelete" type="button" value="DELETE">
-    <div id="userlabel"></div>
-    <input id="signOut" type="button" value="Sign out">
-</div>
-<hr>
-<div id="acti-por">
-    <div id="wantfiles">
-        <textarea id="wfe" rows="40" cols="150"></textarea>
-        <input id="saveWfe" type="button" value="SAVE">
+    <div class="tb-group">
+        <a href=".."><input id="rtrnToEdi" type="button" value="<<== Return to playlist editor <<=="></a>
     </div>
-    <div id="logView">
-        
+    <div class="tb-group">
+        <input id="startCopy" type="button" value="COPY">
+        <input id="startDelete" type="button" value="DELETE">
+    </div>
+    <div id="userlabel"></div>
+    <div class="tb-group">
+        <input id="signOut" type="button" value="Sign out">
+    </div>
+</div>
+<div id="acti-por">
+    <div class="panel" id="wantfiles">
+        <div class="panel-title">
+            <span>wanted files</span>
+            <input id="saveWfe" type="button" value="SAVE">
+        </div>
+        <textarea id="wfe" spellcheck="false"></textarea>
+    </div>
+    <div class="panel" id="logPanel">
+        <div class="panel-title">copy log</div>
+        <div id="logView">
+            
+        </div>
     </div>
 </div>
 </body>
