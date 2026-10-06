@@ -298,8 +298,8 @@
         #ply-view td {
             vertical-align: middle;
         }
-        /* Logo selector and checkbox columns: center under their headers */
-        #ply-view td:nth-child(n+4) {
+        /* All columns except path: center under their headers */
+        #ply-view td:not(:nth-child(3)) {
             text-align: center;
         }
         select.logosel,
