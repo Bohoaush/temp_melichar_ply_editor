@@ -31,19 +31,32 @@
             --hover-live: #9d4a0f;
             --hover-warning: #874015;
         }
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+        }
         body {
             background-color: var(--bg);
             color: var(--text);
             font-family: Calibri, Ubuntu;
+            font-size: clamp(13px, 0.35vw + 9px, 16px);
             line-height: 1.45;
             margin: 0;
+            /* Fill the viewport: toolbars take what they need, tables get the rest */
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
         }
         input[type="button"], button {
             background-color: var(--primary);
             color: var(--text);
             transition: background-color 0.2s ease, transform 0.05s ease, box-shadow 0.2s ease;
             border: 1px solid transparent;
-            padding: 8px 12px;
+            padding: 0.5em 0.75em;
+            font-size: inherit;
+            white-space: nowrap;
             border-radius: 8px;
             font-family: Calibri, Ubuntu;
             font-weight: 600;
@@ -61,10 +74,16 @@
             background-color: var(--panel);
             color: var(--text);
             border: 1px solid var(--border);
-            padding: 8px 12px;
+            padding: 0.5em 0.75em;
             border-radius: 8px;
             font-family: Calibri, Ubuntu;
+            font-size: inherit;
             font-weight: 600;
+            max-width: 100%;
+        }
+        select {
+            min-width: 8em;
+            max-width: 22em;
         }
         input[type="checkbox"] {
             accent-color: var(--primary);
@@ -77,35 +96,72 @@
             font-weight: bold;
             color: var(--muted);
         }
-        #topbar {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            position: sticky;
-            top: 0;
+        #button-panel {
+            flex: 0 0 auto;
+            position: relative;
             z-index: 10;
             background: linear-gradient(180deg, rgba(27,31,39,0.92), rgba(27,31,39,0.86));
             backdrop-filter: saturate(140%) blur(6px);
-            padding: 12px;
             border-bottom: 1px solid var(--border);
             box-shadow: var(--shadow);
+        }
+        #topbar, #actionbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            align-items: center;
+            padding: 10px 12px;
+        }
+        #topbar {
+            border-bottom: 1px solid var(--border);
+        }
+        .tb-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            min-width: 0;
+        }
+        label.tb-check {
+            color: var(--text);
+            font-weight: normal;
+            cursor: pointer;
+        }
+        #ldSemPly {
+            max-width: 16em;
         }
         #rowarn {
             font-weight: bold;
             color: var(--warn);
         }
         #userlabel {
-            flex-grow: 1;
+            flex: 1 1 12em;
             text-align: center;
-            height: 100%;
             background-color: var(--bg-elev);
             color: var(--text);
             padding: 10px 12px;
             border-radius: 8px;
             border: 1px solid var(--border);
         }
-        #acti-por div {
+        #acti-por {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+        }
+        #inspCtgContain, #inspFltrContain {
             display: inline-block;
+        }
+        .panel-title {
+            font-weight: bold;
+            color: var(--muted);
+            padding: 4px 2px;
+        }
+        .panel-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 16px;
         }
         #inspWr button{
             background-color: var(--panel);
@@ -129,8 +185,9 @@
             border: 1px solid var(--border);
         }
         .fixTableHead {
-            overflow-y: auto;
-            height: calc(100vh - 240px);
+            overflow: auto;
+            min-height: 0;
+            min-width: 0;
             background: var(--panel);
             border: 1px solid var(--border);
             border-radius: var(--radius);
@@ -149,7 +206,7 @@
         }
         th,
         td {
-            padding: 10px 14px;
+            padding: 0.6em 0.85em;
             border-bottom: 1px solid var(--border);
             border-right: none;
             border-left: none;
@@ -159,7 +216,8 @@
             color: var(--muted);
             text-transform: uppercase;
             letter-spacing: 0.04em;
-            font-size: 12px;
+            font-size: 0.8em;
+            white-space: nowrap;
             border-bottom: 1px solid var(--border);
         }
         .even {
@@ -198,23 +256,21 @@
             background-color: #f97316;
         }
         #plyViWr {
-            width: 60%;
-            vertical-align: top;
+            flex: 3 1 0;
             padding: 8px;
         }
         #inspWr {
-            width: 35%;
-            vertical-align: top;
+            flex: 2 1 0;
             padding: 8px;
         }
-        #inspWr table tbody td {
-            word-wrap: break-word;
-            max-width: 70%;
+        #ply-view td, #inspector td {
+            overflow-wrap: anywhere;
         }
         #buttonsOnRight {
-            float: right;
+            margin-left: auto;
         }
         #status-view {
+            flex: 0 0 auto;
             margin: 10px 12px 0 12px;
             padding: 10px 12px;
             border-radius: 8px;
@@ -222,6 +278,20 @@
             background: var(--bg-elev);
         }
         #status-view:empty { display: none; }
+
+        /* Medium screens (e.g. 1366x768, 1280x1024): tighter spacing */
+        @media (max-width: 1400px), (max-height: 800px) {
+            #topbar, #actionbar { padding: 6px 10px; gap: 6px 12px; }
+            #acti-por { padding: 8px; gap: 8px; }
+            th, td { padding: 0.45em 0.6em; }
+        }
+        /* Narrow screens / portrait: stack the panels and let the page scroll */
+        @media (max-width: 1000px) {
+            body { height: auto; display: block; }
+            #acti-por { flex-direction: column; }
+            #plyViWr, #inspWr { flex: none; height: 70vh; }
+            #buttonsOnRight { margin-left: 0; }
+        }
 
         /* Row hover */
         #ply-view tbody tr,
@@ -290,56 +360,60 @@
     </style>
 </head>
 <body>
-<div id="status-view">
-</div>
+<div id="status-view"></div>
 <div id="button-panel">
     <div id="topbar">
-        <input id="save" type="button" value="SAVE">
-        &nbsp
-        <select id="ldfilename"></select>
-        &nbsp
-        <input id="load" type="button" value="LOAD">
-        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-        <input type="checkbox" id="autoScroll"> enable auto scroll (use alt + up/down to scroll manually)
-        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-        <input id="exportNewMelPly" type="button" value="EXPORT M1 PLY" title="experimental feature">
-        <select id="ldjsonfilename"></select>
-        <input id="importNewMelPly" type="button" value="IMPORT M1 PLY" title="experimental feature">
-        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+        <div class="tb-group">
+            <input id="save" type="button" value="SAVE">
+            <select id="ldfilename"></select>
+            <input id="load" type="button" value="LOAD">
+        </div>
+        <label class="tb-group tb-check" for="autoScroll">
+            <input type="checkbox" id="autoScroll"> enable auto scroll (use alt + up/down to scroll manually)
+        </label>
+        <div class="tb-group">
+            <input id="exportNewMelPly" type="button" value="EXPORT M1 PLY" title="experimental feature">
+            <select id="ldjsonfilename"></select>
+            <input id="importNewMelPly" type="button" value="IMPORT M1 PLY" title="experimental feature">
+        </div>
         <span id="rowarn"></span>
-        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
         <div id="userlabel"></div>
     </div>
-    <hr>
-    <input id="insert" type="button" value="INSERT">
-    <input id="add" type="button" value="ADD">
-    &nbsp&nbsp&nbsp&nbsp
-    <input id="ins-dummy" type="button" value="INSERT DUMMY">
-    <input id="add-dummy" type="button" value="ADD DUMMY">
-    &nbsp&nbsp&nbsp&nbsp
-    <input id="ins-live" type="button" value="INSERT LIVE">
-    <input id="add-live" type="button" value="ADD LIVE">
-    &nbsp&nbsp&nbsp&nbsp
-    <input id="remove" type="button" value="DELETE">
-    &nbsp&nbsp&nbsp&nbsp
-    <input id="mvUp" type="button" value="UP">
-    <input id="mvDwn" type="button" value="DOWN">
-    &nbsp&nbsp&nbsp&nbsp
-    <label for="ldSemPly">LOAD PLY FROM SEM:</label><input id="ldSemPly" type="file" accept=".ply,.txt" onChange="loadSemPly()">
-    &nbsp&nbsp&nbsp&nbsp
-    <input id="updInsp" type="button" value="UPDATE AVAILABLE CLIPS">
-    <div id="buttonsOnRight">
-    <a href="copy"><input id="gotoFilecopier" type="button" value="==>> GO TO FILE COPIER ==>>"></a>
-    <input id="signOut" type="button" value="Sign out">
+    <div id="actionbar">
+        <div class="tb-group">
+            <input id="insert" type="button" value="INSERT">
+            <input id="add" type="button" value="ADD">
+        </div>
+        <div class="tb-group">
+            <input id="ins-dummy" type="button" value="INSERT DUMMY">
+            <input id="add-dummy" type="button" value="ADD DUMMY">
+        </div>
+        <div class="tb-group">
+            <input id="ins-live" type="button" value="INSERT LIVE">
+            <input id="add-live" type="button" value="ADD LIVE">
+        </div>
+        <div class="tb-group">
+            <input id="remove" type="button" value="DELETE">
+        </div>
+        <div class="tb-group">
+            <input id="mvUp" type="button" value="UP">
+            <input id="mvDwn" type="button" value="DOWN">
+        </div>
+        <div class="tb-group">
+            <label for="ldSemPly">LOAD PLY FROM SEM:</label><input id="ldSemPly" type="file" accept=".ply,.txt" onChange="loadSemPly()">
+        </div>
+        <div class="tb-group">
+            <input id="updInsp" type="button" value="UPDATE AVAILABLE CLIPS">
+        </div>
+        <div id="buttonsOnRight" class="tb-group">
+            <a href="copy"><input id="gotoFilecopier" type="button" value="==>> GO TO FILE COPIER ==>>"></a>
+            <input id="signOut" type="button" value="Sign out">
+        </div>
     </div>
 </div>
-<hr>
 <div id="acti-por">
     <div class="fixTableHead" id="plyViWr">
-        playlist
+        <div class="panel-title">playlist</div>
         <table id="ply-view">
             <thead>
                 <tr><th>start time</th><th>duration</th><th>path</th><th>logo</th><th>logo 4:3</th><th>disable IS</th><th>loop</th></tr>
@@ -350,10 +424,12 @@
         </table>
     </div>
     <div class="fixTableHead" id="inspWr">
-        <input type="checkbox" id="filterToggle" checked> enable filtering
-        <input type="checkbox" id="filterSubstrToggle"> enable substring filtering
-        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-        available clips:<br><div id="inspCtgContain"></div><div id="inspFltrContain"></div>
+        <div class="panel-controls">
+            <label class="tb-check" for="filterToggle"><input type="checkbox" id="filterToggle" checked> enable filtering</label>
+            <label class="tb-check" for="filterSubstrToggle"><input type="checkbox" id="filterSubstrToggle"> enable substring filtering</label>
+        </div>
+        <div class="panel-title">available clips:</div>
+        <div id="inspCtgContain"></div><div id="inspFltrContain"></div>
         <table id="inspector">
             <thead>
                 <tr><th>name</th><th>duration</th></tr>
