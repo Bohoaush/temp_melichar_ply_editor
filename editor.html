@@ -297,8 +297,12 @@
             flex: 2 1 0;
             padding: 8px;
         }
-        #ply-view td, #inspector td {
+        /* Only the path / clip name may wrap; times, durations and controls stay on one line */
+        #ply-view td:nth-child(3), #inspector td:nth-child(1) {
             overflow-wrap: anywhere;
+        }
+        #ply-view td:not(:nth-child(3)), #inspector td:not(:nth-child(1)) {
+            white-space: nowrap;
         }
         #ply-view td {
             vertical-align: middle;
